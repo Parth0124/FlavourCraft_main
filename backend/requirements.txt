@@ -1,0 +1,40 @@
+# Core Framework
+fastapi==0.109.0
+uvicorn[standard]==0.27.0
+python-multipart==0.0.6
+
+# Database
+motor==3.3.2  # Async MongoDB driver
+pymongo==4.6.1
+
+# Authentication & Security
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+bcrypt==4.1.2
+pydantic[email]==2.5.3
+
+# AI & ML
+openai==1.10.0
+transformers==4.37.0
+torch==2.1.2
+torchvision==0.16.2
+Pillow==10.2.0
+numpy==1.26.3
+
+# Image Processing
+python-magic==0.4.27  # File type detection
+
+# Utilities
+python-dotenv==1.0.0
+pydantic-settings==2.1.0
+
+# Testing
+pytest==7.4.4
+pytest-asyncio==0.23.3
+httpx==0.26.0
+
+# Logging
+python-json-logger==2.0.7
+
+# CORS
+fastapi-cors==0.0.6

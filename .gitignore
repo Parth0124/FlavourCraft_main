@@ -1,0 +1,4 @@
+*.env
+flavourcraftenv/
+backend/config.pybackend/config.py
+*.pyc
