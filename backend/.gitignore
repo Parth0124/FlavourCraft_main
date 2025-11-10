@@ -1,0 +1,4 @@
+.env
+config.py
+flavourcraftenv/
+node_modules/
