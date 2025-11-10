@@ -1,23 +1,22 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import { ChefHat, BookOpen, Heart, Utensils, User, Menu, X } from "lucide-react";
+import { useAuth } from "../context/AuthContext";
 
 const Navbar = () => {
   const navigate = useNavigate();
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { user, logout } = useAuth();
   const [showDropdown, setShowDropdown] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
 
-  useEffect(() => {
-    const user = localStorage.getItem("user");
-    setIsLoggedIn(!!user);
-  }, []);
-
-  const handleLogout = () => {
-    localStorage.removeItem("user");
-    setIsLoggedIn(false);
-    setShowDropdown(false);
-    navigate("/");
+  const handleLogout = async () => {
+    try {
+      await logout();
+      setShowDropdown(false);
+      setShowMobileMenu(false);
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
   };
 
   return (
@@ -38,33 +37,33 @@ const Navbar = () => {
 
         {/* Desktop Navigation Links */}
         <div className="hidden md:flex items-center space-x-8">
-          <a
-            href="/"
+          <Link
+            to="/recipes"
             className="flex items-center space-x-2 px-4 py-2 rounded-lg hover:bg-orange-50 transition-all duration-200 group"
           >
             <Utensils className="w-4 h-4 text-orange-500 group-hover:scale-110 transition-transform" />
             <span className="font-medium text-gray-700 group-hover:text-orange-600">
               Recipes
             </span>
-          </a>
-          <a
-            href="/favorites"
+          </Link>
+          <Link
+            to="/favorites"
             className="flex items-center space-x-2 px-4 py-2 rounded-lg hover:bg-orange-50 transition-all duration-200 group"
           >
             <Heart className="w-4 h-4 text-orange-500 group-hover:scale-110 transition-transform" />
             <span className="font-medium text-gray-700 group-hover:text-orange-600">
               Favorites
             </span>
-          </a>
-          <a
-            href="/collections"
+          </Link>
+          <Link
+            to="/collections"
             className="flex items-center space-x-2 px-4 py-2 rounded-lg hover:bg-orange-50 transition-all duration-200 group"
           >
             <BookOpen className="w-4 h-4 text-orange-500 group-hover:scale-110 transition-transform" />
             <span className="font-medium text-gray-700 group-hover:text-orange-600">
               Collections
             </span>
-          </a>
+          </Link>
         </div>
 
         {/* Right Section */}
@@ -80,7 +79,7 @@ const Navbar = () => {
 
           {/* Desktop Auth Section */}
           <div className="hidden sm:flex items-center space-x-2">
-            {!isLoggedIn ? (
+            {!user ? (
               <>
                 <button
                   onClick={() => navigate("/login")}
@@ -99,24 +98,40 @@ const Navbar = () => {
               <div className="relative">
                 <button
                   onClick={() => setShowDropdown(!showDropdown)}
-                  className="p-2 bg-orange-100 rounded-full hover:bg-orange-200 transition"
+                  className="p-2 bg-orange-100 rounded-full hover:bg-orange-200 transition flex items-center space-x-2"
                 >
                   <User className="text-orange-600 w-6 h-6" />
+                  <span className="text-sm font-medium text-orange-700 hidden lg:inline">
+                    {user.username}
+                  </span>
                 </button>
                 {showDropdown && (
-                  <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded-xl shadow-lg z-10">
+                  <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-xl shadow-lg z-10">
+                    <div className="px-4 py-2 border-b border-gray-100">
+                      <p className="text-sm text-gray-500">Signed in as</p>
+                      <p className="text-sm font-medium text-gray-800 truncate">{user.email}</p>
+                    </div>
+                    <button
+                      onClick={() => {
+                        navigate("/preferences");
+                        setShowDropdown(false);
+                      }}
+                      className="w-full text-left px-4 py-2 hover:bg-orange-50 text-gray-700 transition"
+                    >
+                      Preferences
+                    </button>
                     <button
                       onClick={() => {
                         navigate("/edit-profile");
                         setShowDropdown(false);
                       }}
-                      className="w-full text-left px-4 py-2 hover:bg-orange-50 text-gray-700"
+                      className="w-full text-left px-4 py-2 hover:bg-orange-50 text-gray-700 transition"
                     >
                       Edit Profile
                     </button>
                     <button
                       onClick={handleLogout}
-                      className="w-full text-left px-4 py-2 hover:bg-orange-50 text-gray-700"
+                      className="w-full text-left px-4 py-2 hover:bg-orange-50 text-red-600 border-t border-gray-100 transition"
                     >
                       Logout
                     </button>
@@ -140,35 +155,43 @@ const Navbar = () => {
       {showMobileMenu && (
         <div className="md:hidden bg-white border-t border-orange-100">
           <div className="px-4 py-4 space-y-3">
+            {/* Mobile User Info */}
+            {user && (
+              <div className="px-4 py-3 bg-orange-50 rounded-lg mb-3">
+                <p className="text-sm text-gray-600">Logged in as</p>
+                <p className="font-medium text-gray-800">{user.username}</p>
+              </div>
+            )}
+
             {/* Mobile Navigation Links */}
-            <a
-              href="/"
-              className="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-orange-50 transition-all duration-200"
+            <Link
+              to="/recipes"
+              className="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-orange-50 transition-all duration-200 block"
               onClick={() => setShowMobileMenu(false)}
             >
               <Utensils className="w-5 h-5 text-orange-500" />
               <span className="font-medium text-gray-700">Recipes</span>
-            </a>
-            <a
-              href="/favorites"
-              className="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-orange-50 transition-all duration-200"
+            </Link>
+            <Link
+              to="/favorites"
+              className="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-orange-50 transition-all duration-200 block"
               onClick={() => setShowMobileMenu(false)}
             >
               <Heart className="w-5 h-5 text-orange-500" />
               <span className="font-medium text-gray-700">Favorites</span>
-            </a>
-            <a
-              href="/collections"
-              className="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-orange-50 transition-all duration-200"
+            </Link>
+            <Link
+              to="/collections"
+              className="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-orange-50 transition-all duration-200 block"
               onClick={() => setShowMobileMenu(false)}
             >
               <BookOpen className="w-5 h-5 text-orange-500" />
               <span className="font-medium text-gray-700">Collections</span>
-            </a>
+            </Link>
 
             {/* Mobile Auth Section */}
             <div className="pt-3 border-t border-orange-100 space-y-3">
-              {!isLoggedIn ? (
+              {!user ? (
                 <>
                   <button
                     onClick={() => {
@@ -193,6 +216,16 @@ const Navbar = () => {
                 <>
                   <button
                     onClick={() => {
+                      navigate("/preferences");
+                      setShowMobileMenu(false);
+                    }}
+                    className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-orange-50 text-gray-700 transition"
+                  >
+                    <User className="w-5 h-5 text-orange-500" />
+                    <span className="font-medium">Preferences</span>
+                  </button>
+                  <button
+                    onClick={() => {
                       navigate("/edit-profile");
                       setShowMobileMenu(false);
                     }}
@@ -206,7 +239,7 @@ const Navbar = () => {
                       handleLogout();
                       setShowMobileMenu(false);
                     }}
-                    className="w-full text-left px-4 py-3 rounded-lg hover:bg-orange-50 text-gray-700 font-medium transition"
+                    className="w-full text-left px-4 py-3 rounded-lg hover:bg-orange-50 text-red-600 font-medium transition"
                   >
                     Logout
                   </button>

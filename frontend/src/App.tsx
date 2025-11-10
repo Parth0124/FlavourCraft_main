@@ -3,7 +3,10 @@ import {
   Routes,
   Route,
   useLocation,
+  Navigate,
 } from "react-router-dom";
+import { AuthProvider } from "./context/AuthContext";
+import { ProtectedRoute } from "./components/ProtectedRoute";
 import Footer from "./components/Footer";
 import Hero from "./components/Hero";
 import Info from "./components/Info";
@@ -18,7 +21,7 @@ import UserPreferences from "./components/UserPreference";
 import About from "./pages/About";
 import Blog from "./pages/Blog";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
-// ✅ Import the new Login Page
+import StaticRecipes from "./pages/StaticRecipes";
 
 // Layout wrapper to handle conditional Footer
 const Layout = () => {
@@ -28,7 +31,9 @@ const Layout = () => {
     <div>
       <Navbar />
       <Routes>
-        {/* Home Page */}
+        {/* Public Routes */}
+        
+        {/* Home Page - Public */}
         <Route
           path="/"
           element={
@@ -39,27 +44,71 @@ const Layout = () => {
           }
         />
 
+        {/* Auth Routes - Redirect to home if already logged in */}
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignupPage />} />
+
+        {/* Static Recipes - Public (browsing allowed without login) */}
+        <Route path="/recipes" element={<StaticRecipes />} />
+
+        {/* Protected Routes - Require Authentication */}
+        
         {/* Ingredient Upload Page */}
         <Route
           path="/upload"
-          element={<IngredientUploadPage onNavigate={() => {}} />}
+          element={
+            <ProtectedRoute>
+              <IngredientUploadPage onNavigate={() => {}} />
+            </ProtectedRoute>
+          }
         />
 
         {/* Favorites Page */}
-        <Route path="/favorites" element={<FavoritesPage />} />
+        <Route 
+          path="/favorites" 
+          element={
+            <ProtectedRoute>
+              <FavoritesPage />
+            </ProtectedRoute>
+          } 
+        />
 
         {/* Collections Page */}
-        <Route path="/collections" element={<CollectionsPage />} />
+        <Route 
+          path="/collections" 
+          element={
+            <ProtectedRoute>
+              <CollectionsPage />
+            </ProtectedRoute>
+          } 
+        />
 
-        {/* ✅ New Login Route */}
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/signup" element={<SignupPage />} />
-        <Route path="/edit-profile" element={<EditProfilePage />} />
-        <Route path="/preferences" element={<UserPreferences />} />
+        {/* Profile Management */}
+        <Route 
+          path="/edit-profile" 
+          element={
+            <ProtectedRoute>
+              <EditProfilePage />
+            </ProtectedRoute>
+          } 
+        />
+        
+        <Route 
+          path="/preferences" 
+          element={
+            <ProtectedRoute>
+              <UserPreferences />
+            </ProtectedRoute>
+          } 
+        />
+
+        {/* Public Info Pages */}
         <Route path="/about" element={<About />} />
-        <Route path="/blog" element={<Blog/>}/>
+        <Route path="/blog" element={<Blog />} />
+        <Route path="/privacy" element={<PrivacyPolicy />} />
+
+        {/* 404 Page */}
         <Route path="*" element={<div className="p-10">Page Not Found</div>} />
-        <Route path="/privacy" element={<PrivacyPolicy/>} />
       </Routes>
 
       {/* Hide footer only on /upload */}
@@ -71,7 +120,9 @@ const Layout = () => {
 const App = () => {
   return (
     <Router>
-      <Layout />
+      <AuthProvider>
+        <Layout />
+      </AuthProvider>
     </Router>
   );
 };

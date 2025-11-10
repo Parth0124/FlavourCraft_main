@@ -145,6 +145,7 @@ async def get_static_recipe(
 @router.post("/generate", response_model=GeneratedRecipeResponse, status_code=status.HTTP_201_CREATED)
 async def generate_recipe(
     request: GeneratedRecipeRequest,
+    image_urls: Optional[Dict] = None,  # Accept image URLs from upload
     current_user: UserResponse = Depends(get_current_user),
     db: AsyncIOMotorDatabase = Depends(get_database)
 ):
@@ -156,15 +157,17 @@ async def generate_recipe(
     - **cuisine_type**: Optional cuisine type (e.g., "indian", "italian")
     - **cooking_time**: Optional maximum cooking time in minutes
     - **difficulty**: Optional difficulty level (easy/medium/hard)
+    - **image_urls**: Optional image URLs from the upload endpoint
     
-    Returns the generated recipe
+    Returns the generated recipe with ingredient image
     """
     try:
         recipe_service = RecipeGenerationService(db)
         
         recipe = await recipe_service.generate_and_save_recipe(
             user_id=current_user.id,
-            request=request
+            request=request,
+            image_urls=image_urls  # Pass image URLs to service
         )
         
         logger.info(f"Recipe generated for user {current_user.email}: {recipe.recipe.title}")
@@ -228,6 +231,7 @@ async def get_generated_recipe(
     """
     try:
         from bson import ObjectId
+        from models.generated_recipe import GeneratedRecipe, ImageUrls
         
         recipe_service = RecipeGenerationService(db)
         
@@ -242,14 +246,18 @@ async def get_generated_recipe(
                 detail="Recipe not found"
             )
         
-        from models.generated_recipe import GeneratedRecipe
+        # Parse image URLs if present
+        image_urls = None
+        if doc.get("image_urls"):
+            image_urls = ImageUrls(**doc["image_urls"])
         
         return GeneratedRecipeResponse(
             id=str(doc["_id"]),
             recipe=GeneratedRecipe(**doc["generated_recipe"]),
             ingredients_used=doc["ingredients"],
             created_at=doc["timestamp"],
-            is_favorite=doc.get("is_favorite", False)
+            is_favorite=doc.get("is_favorite", False),
+            image_urls=image_urls
         )
         
     except HTTPException:
@@ -312,6 +320,8 @@ async def get_favorite_recipes(
     - **page_size**: Recipes per page
     """
     try:
+        from models.generated_recipe import GeneratedRecipe, ImageUrls
+        
         recipe_service = RecipeGenerationService(db)
         
         skip = (page - 1) * page_size
@@ -328,16 +338,20 @@ async def get_favorite_recipes(
             "is_favorite": True
         }).sort("timestamp", -1).skip(skip).limit(page_size)
         
-        from models.generated_recipe import GeneratedRecipe
-        
         recipes = []
         async for doc in cursor:
+            # Parse image URLs if present
+            image_urls = None
+            if doc.get("image_urls"):
+                image_urls = ImageUrls(**doc["image_urls"])
+            
             recipes.append(GeneratedRecipeResponse(
                 id=str(doc["_id"]),
                 recipe=GeneratedRecipe(**doc["generated_recipe"]),
                 ingredients_used=doc["ingredients"],
                 created_at=doc["timestamp"],
-                is_favorite=True
+                is_favorite=True,
+                image_urls=image_urls
             ))
         
         return RecipeHistoryResponse(

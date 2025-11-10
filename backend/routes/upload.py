@@ -7,6 +7,7 @@ from typing import Dict
 from models.user import UserResponse
 from dependencies import get_current_user
 from services.ingredient_service import ingredient_service
+from services.cloudinary_service import cloudinary_service
 from services.storage_service import file_storage
 from utils.validators import validate_image_file, sanitize_filename
 from utils.logger import get_logger
@@ -26,7 +27,7 @@ async def upload_image(
     
     - **file**: Image file (JPG, PNG, WEBP, max 10MB)
     
-    Returns detected ingredients with confidence scores
+    Returns detected ingredients with confidence scores and image URLs
     """
     try:
         # Validate file
@@ -46,13 +47,36 @@ async def upload_image(
         
         logger.info(f"Image uploaded by user {current_user.email}: {safe_filename}")
         
+        # Upload to Cloudinary (non-blocking, continues even if fails)
+        image_urls = None
+        try:
+            image_upload_result = await cloudinary_service.upload_image(
+                image_bytes=content,
+                user_id=current_user.id,
+                filename=safe_filename,
+                folder="ingredient_images"
+            )
+            
+            if image_upload_result:
+                image_urls = {
+                    "url": image_upload_result["secure_url"],
+                    "thumbnail_url": image_upload_result["thumbnail_url"],
+                    "medium_url": image_upload_result["medium_url"],
+                    "public_id": image_upload_result["public_id"]
+                }
+                logger.info(f"✅ Image uploaded to Cloudinary: {image_urls['url']}")
+            else:
+                logger.warning("⚠️  Cloudinary upload failed - continuing without image URL")
+        except Exception as cloudinary_error:
+            logger.error(f"Cloudinary upload error (non-critical): {str(cloudinary_error)}")
+        
         # Detect ingredients
         detection_results = await ingredient_service.detect_ingredients(content)
         
         # Clean up temp file
         await file_storage.delete_file(temp_path)
         
-        return {
+        response = {
             "status": "success",
             "filename": file.filename,
             "ingredients": detection_results["ingredients"],
@@ -64,9 +88,12 @@ async def upload_image(
                 "total_unique": detection_results["total_unique"]
             },
             "message": "Please review and verify the detected ingredients before generating a recipe",
-            "requires_verification": True,  # Frontend should show confirmation UI
-            "next_step": "Review ingredients, add/remove items, then call POST /recipes/generate"
+            "requires_verification": True,
+            "next_step": "Review ingredients, add/remove items, then call POST /recipes/generate",
+            "image_urls": image_urls  # Include image URLs in response
         }
+        
+        return response
         
     except HTTPException:
         raise
@@ -88,7 +115,7 @@ async def upload_multiple_images(
     
     - **files**: List of image files (max 5 images)
     
-    Returns combined detected ingredients
+    Returns combined detected ingredients with image URLs
     """
     if len(files) > 5:
         raise HTTPException(
@@ -100,6 +127,7 @@ async def upload_multiple_images(
         all_ingredients = []
         total_confidence = 0.0
         results_details = []
+        image_urls_list = []
         
         for file in files:
             # Validate each file
@@ -110,6 +138,31 @@ async def upload_multiple_images(
             
             # Read and process
             content = await file.read()
+            
+            # Upload to Cloudinary
+            image_urls = None
+            try:
+                safe_filename = sanitize_filename(file.filename)
+                image_upload_result = await cloudinary_service.upload_image(
+                    image_bytes=content,
+                    user_id=current_user.id,
+                    filename=safe_filename,
+                    folder="ingredient_images"
+                )
+                
+                if image_upload_result:
+                    image_urls = {
+                        "url": image_upload_result["secure_url"],
+                        "thumbnail_url": image_upload_result["thumbnail_url"],
+                        "medium_url": image_upload_result["medium_url"],
+                        "public_id": image_upload_result["public_id"],
+                        "filename": file.filename
+                    }
+                    image_urls_list.append(image_urls)
+            except Exception as cloudinary_error:
+                logger.error(f"Cloudinary upload error for {file.filename}: {str(cloudinary_error)}")
+            
+            # Detect ingredients
             detection_results = await ingredient_service.detect_ingredients(content)
             
             # Collect results
@@ -118,7 +171,8 @@ async def upload_multiple_images(
             results_details.append({
                 "filename": file.filename,
                 "ingredients": detection_results["ingredients"],
-                "confidence": detection_results["confidence"]
+                "confidence": detection_results["confidence"],
+                "image_urls": image_urls
             })
         
         # Remove duplicates (case-insensitive)
@@ -140,6 +194,7 @@ async def upload_multiple_images(
             "ingredients": unique_ingredients,
             "average_confidence": round(avg_confidence, 2),
             "details": results_details,
+            "image_urls_list": image_urls_list,  # All uploaded images
             "message": "Please review and verify the detected ingredients before generating a recipe",
             "requires_verification": True
         }

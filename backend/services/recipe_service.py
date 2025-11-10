@@ -239,7 +239,8 @@ SERVINGS: [number of servings]
     async def generate_and_save_recipe(
         self,
         user_id: str,
-        request: GeneratedRecipeRequest
+        request: GeneratedRecipeRequest,
+        image_urls: Optional[Dict] = None
     ) -> GeneratedRecipeResponse:
         """
         Generate recipe and save to database
@@ -247,6 +248,7 @@ SERVINGS: [number of servings]
         Args:
             user_id: User ID
             request: Recipe generation request
+            image_urls: Optional dictionary with image URLs from Cloudinary
             
         Returns:
             Generated recipe response
@@ -273,7 +275,8 @@ SERVINGS: [number of servings]
             "is_favorite": False,
             "timestamp": datetime.utcnow(),
             "dietary_preferences": request.dietary_preferences or [],
-            "cuisine_type": request.cuisine_type
+            "cuisine_type": request.cuisine_type,
+            "image_urls": image_urls  # Store Cloudinary image URLs
         }
         
         # Save to database
@@ -281,12 +284,19 @@ SERVINGS: [number of servings]
         
         logger.info(f"Recipe saved for user {user_id}: {recipe.title}")
         
+        # Parse image URLs for response
+        from models.generated_recipe import ImageUrls
+        parsed_image_urls = None
+        if image_urls:
+            parsed_image_urls = ImageUrls(**image_urls)
+        
         return GeneratedRecipeResponse(
             id=str(result.inserted_id),
             recipe=recipe,
             ingredients_used=request.ingredients,
             created_at=recipe_doc["timestamp"],
-            is_favorite=False
+            is_favorite=False,
+            image_urls=parsed_image_urls
         )
     
     async def get_user_recipe_history(
@@ -318,14 +328,22 @@ SERVINGS: [number of servings]
             {"user_id": user_id}
         ).sort("timestamp", -1).skip(skip).limit(page_size)
         
+        from models.generated_recipe import ImageUrls
+        
         recipes = []
         async for doc in cursor:
+            # Parse image URLs if present
+            image_urls = None
+            if doc.get("image_urls"):
+                image_urls = ImageUrls(**doc["image_urls"])
+            
             recipes.append(GeneratedRecipeResponse(
                 id=str(doc["_id"]),
                 recipe=GeneratedRecipe(**doc["generated_recipe"]),
                 ingredients_used=doc["ingredients"],
                 created_at=doc["timestamp"],
-                is_favorite=doc.get("is_favorite", False)
+                is_favorite=doc.get("is_favorite", False),
+                image_urls=image_urls
             ))
         
         return {

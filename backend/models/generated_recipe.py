@@ -57,6 +57,24 @@ class GeneratedRecipe(BaseModel):
         }
 
 
+class ImageUrls(BaseModel):
+    """Image URLs from Cloudinary"""
+    url: str  # Full-size image URL
+    thumbnail_url: str  # 200x200 thumbnail
+    medium_url: str  # 600x600 medium size
+    public_id: str  # Cloudinary public ID for deletion
+    
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "url": "https://res.cloudinary.com/demo/image/upload/sample.jpg",
+                "thumbnail_url": "https://res.cloudinary.com/demo/image/upload/c_thumb,w_200/sample.jpg",
+                "medium_url": "https://res.cloudinary.com/demo/image/upload/c_limit,w_600/sample.jpg",
+                "public_id": "ingredient_images/user_123/abc123"
+            }
+        }
+
+
 class GeneratedRecipeDocument(BaseModel):
     """Complete generated recipe as stored in database"""
     id: Optional[str] = Field(None, alias="_id")
@@ -69,6 +87,7 @@ class GeneratedRecipeDocument(BaseModel):
     timestamp: datetime = Field(default_factory=datetime.utcnow)
     dietary_preferences: List[str] = Field(default_factory=list)
     cuisine_type: Optional[str] = None
+    image_urls: Optional[ImageUrls] = None  # Ingredient image URLs from Cloudinary
     
     class Config:
         populate_by_name = True
@@ -105,6 +124,7 @@ class GeneratedRecipeResponse(BaseModel):
     ingredients_used: List[str]
     created_at: datetime
     is_favorite: bool
+    image_urls: Optional[ImageUrls] = None  # Include the ingredient image URLs
     
     class Config:
         json_schema_extra = {
@@ -120,7 +140,13 @@ class GeneratedRecipeResponse(BaseModel):
                 },
                 "ingredients_used": ["rice", "tomato", "onion", "spices"],
                 "created_at": "2025-09-17T15:00:00Z",
-                "is_favorite": False
+                "is_favorite": False,
+                "image_urls": {
+                    "url": "https://res.cloudinary.com/demo/image/upload/sample.jpg",
+                    "thumbnail_url": "https://res.cloudinary.com/demo/image/upload/c_thumb,w_200/sample.jpg",
+                    "medium_url": "https://res.cloudinary.com/demo/image/upload/c_limit,w_600/sample.jpg",
+                    "public_id": "ingredient_images/user_123/abc123"
+                }
             }
         }
 

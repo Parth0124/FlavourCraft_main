@@ -1,0 +1,608 @@
+[{
+  "_id": {
+    "$oid": "69124a750f431363af69d6f9"
+  },
+  "title": "Paneer Butter Masala",
+  "ingredients": [
+    "500g paneer, cubed",
+    "2 large tomatoes, pureed",
+    "200ml heavy cream",
+    "2 tbsp butter",
+    "1 onion, finely chopped",
+    "2 tsp garam masala",
+    "1 tsp kasuri methi",
+    "Salt to taste"
+  ],
+  "instructions": "1. Heat butter in a pan over medium heat.\n2. Add onions and sauté until golden.\n3. Add tomato puree and cook for 10 minutes.\n4. Add garam masala and kasuri methi.\n5. Add cream and paneer cubes.\n6. Simmer for 5 minutes and serve hot.",
+  "tags": [
+    "vegetarian",
+    "north-indian",
+    "main-course"
+  ],
+  "difficulty": "medium",
+  "prep_time": 15,
+  "cook_time": 30,
+  "servings": 4,
+  "nutrition": {
+    "calories": 450,
+    "protein": 20,
+    "carbs": 15,
+    "fat": 35
+  },
+  "image_url": "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=800&q=80"
+},
+{
+  "_id": {
+    "$oid": "69124a750f431363af69d6fa"
+  },
+  "title": "Tomato Basil Soup",
+  "ingredients": [
+    "6 ripe tomatoes",
+    "1 onion",
+    "2 cloves garlic",
+    "1 cup basil leaves",
+    "2 cups vegetable stock",
+    "Salt and pepper to taste"
+  ],
+  "instructions": "1. Roast tomatoes, onion and garlic.\n2. Blend with basil and stock.\n3. Simmer 10 minutes and season.",
+  "tags": [
+    "vegetarian",
+    "soup",
+    "italian"
+  ],
+  "difficulty": "easy",
+  "prep_time": 10,
+  "cook_time": 20,
+  "servings": 3,
+  "nutrition": {
+    "calories": 120,
+    "protein": 4,
+    "carbs": 22,
+    "fat": 2
+  },
+  "image_url": "https://images.unsplash.com/photo-1547592166-23ac45744acd?w=800&q=80"
+},
+{
+  "_id": {
+    "$oid": "69124a750f431363af69d6fb"
+  },
+  "title": "Spicy Chicken Stir-Fry",
+  "ingredients": [
+    "400g chicken breast, sliced",
+    "1 bell pepper",
+    "2 tbsp soy sauce",
+    "1 tbsp sriracha",
+    "2 cloves garlic",
+    "1 tbsp oil"
+  ],
+  "instructions": "1. Marinate chicken with soy and sriracha.\n2. Stir fry garlic then chicken.\n3. Add veggies and finish.",
+  "tags": [
+    "non-vegetarian",
+    "asian",
+    "main-course"
+  ],
+  "difficulty": "easy",
+  "prep_time": 10,
+  "cook_time": 12,
+  "servings": 2,
+  "nutrition": {
+    "calories": 320,
+    "protein": 42,
+    "carbs": 8,
+    "fat": 12
+  },
+  "image_url": "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?w=800&q=80"
+},
+{
+  "_id": {
+    "$oid": "69124a750f431363af69d6fc"
+  },
+  "title": "Vegetable Biryani",
+  "ingredients": [
+    "2 cups basmati rice",
+    "1 cup mixed vegetables",
+    "2 onions",
+    "2 tsp biryani masala",
+    "Salt to taste"
+  ],
+  "instructions": "1. Parboil rice.\n2. Fry onions and vegetables with masala.\n3. Layer rice and vegetables and cook on low heat.",
+  "tags": [
+    "vegetarian",
+    "indian",
+    "main-course"
+  ],
+  "difficulty": "hard",
+  "prep_time": 30,
+  "cook_time": 60,
+  "servings": 6,
+  "nutrition": {
+    "calories": 380,
+    "protein": 8,
+    "carbs": 72,
+    "fat": 6
+  },
+  "image_url": "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=800&q=80"
+},
+{
+  "_id": {
+    "$oid": "69124a750f431363af69d6fd"
+  },
+  "title": "Quick Oats Pancake",
+  "ingredients": [
+    "1 cup oats",
+    "1 banana",
+    "1 egg",
+    "1/2 cup milk",
+    "1 tsp baking powder"
+  ],
+  "instructions": "1. Blend all ingredients.\n2. Pour batter on pan and cook until golden.",
+  "tags": [
+    "vegetarian",
+    "breakfast",
+    "quick"
+  ],
+  "difficulty": "easy",
+  "prep_time": 5,
+  "cook_time": 10,
+  "servings": 2,
+  "nutrition": {
+    "calories": 280,
+    "protein": 12,
+    "carbs": 42,
+    "fat": 7
+  },
+  "image_url": "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=800&q=80"
+},
+{
+  "_id": {
+    "$oid": "69124a750f431363af69d6fe"
+  },
+  "title": "Chole Bhature",
+  "ingredients": [
+    "2 cups chickpeas",
+    "2 onions",
+    "2 tomatoes",
+    "1 tsp garam masala",
+    "Oil for frying",
+    "2 cups flour"
+  ],
+  "instructions": "1. Soak chickpeas overnight.\n2. Cook with spices and onions.\n3. Knead flour into dough and deep fry to make bhature.\n4. Serve hot with chole.",
+  "tags": [
+    "vegetarian",
+    "north-indian",
+    "main-course"
+  ],
+  "difficulty": "medium",
+  "prep_time": 20,
+  "cook_time": 40,
+  "servings": 4,
+  "nutrition": {
+    "calories": 520,
+    "protein": 16,
+    "carbs": 68,
+    "fat": 20
+  },
+  "image_url": "https://images.unsplash.com/photo-1626074353765-517a681e40be?w=800&q=80"
+},
+{
+  "_id": {
+    "$oid": "69124a750f431363af69d6ff"
+  },
+  "title": "Egg Fried Rice",
+  "ingredients": [
+    "2 cups cooked rice",
+    "2 eggs",
+    "1 tbsp soy sauce",
+    "1 onion",
+    "1 carrot",
+    "Oil"
+  ],
+  "instructions": "1. Scramble eggs and set aside.\n2. Fry onion and vegetables.\n3. Add rice, soy sauce, and eggs. Mix well.",
+  "tags": [
+    "non-vegetarian",
+    "asian",
+    "quick"
+  ],
+  "difficulty": "easy",
+  "prep_time": 10,
+  "cook_time": 15,
+  "servings": 2,
+  "nutrition": {
+    "calories": 420,
+    "protein": 14,
+    "carbs": 58,
+    "fat": 14
+  },
+  "image_url": "https://images.unsplash.com/photo-1512058564366-18510be2db19?w=800&q=80"
+},
+{
+  "_id": {
+    "$oid": "69124a750f431363af69d700"
+  },
+  "title": "Classic Margherita Pizza",
+  "ingredients": [
+    "Pizza dough",
+    "Tomato sauce",
+    "Mozzarella cheese",
+    "Fresh basil",
+    "Olive oil"
+  ],
+  "instructions": "1. Spread tomato sauce on dough.\n2. Add mozzarella and basil.\n3. Bake at 220°C for 12 minutes.",
+  "tags": [
+    "vegetarian",
+    "italian",
+    "main-course"
+  ],
+  "difficulty": "medium",
+  "prep_time": 20,
+  "cook_time": 15,
+  "servings": 2,
+  "nutrition": {
+    "calories": 580,
+    "protein": 24,
+    "carbs": 68,
+    "fat": 22
+  },
+  "image_url": "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=800&q=80"
+},
+{
+  "_id": {
+    "$oid": "69124a750f431363af69d701"
+  },
+  "title": "Masala Dosa",
+  "ingredients": [
+    "1 cup rice",
+    "1/2 cup urad dal",
+    "2 boiled potatoes",
+    "1 onion",
+    "1 tsp mustard seeds",
+    "Oil"
+  ],
+  "instructions": "1. Ferment rice and dal batter.\n2. Prepare potato filling.\n3. Cook dosa on tawa, stuff filling inside and serve.",
+  "tags": [
+    "vegetarian",
+    "south-indian",
+    "breakfast"
+  ],
+  "difficulty": "hard",
+  "prep_time": 30,
+  "cook_time": 25,
+  "servings": 3,
+  "nutrition": {
+    "calories": 350,
+    "protein": 10,
+    "carbs": 62,
+    "fat": 8
+  },
+  "image_url": "https://images.unsplash.com/photo-1668236543090-82eba5ee5976?w=800&q=80"
+},
+{
+  "_id": {
+    "$oid": "69124a750f431363af69d702"
+  },
+  "title": "Chicken Tikka",
+  "ingredients": [
+    "500g chicken",
+    "1 cup yogurt",
+    "2 tsp red chili powder",
+    "1 tbsp ginger garlic paste",
+    "1 tbsp lemon juice"
+  ],
+  "instructions": "1. Marinate chicken with yogurt and spices for 2 hours.\n2. Grill or bake until cooked.\n3. Serve with mint chutney.",
+  "tags": [
+    "non-vegetarian",
+    "indian",
+    "starter"
+  ],
+  "difficulty": "medium",
+  "prep_time": 15,
+  "cook_time": 25,
+  "servings": 4,
+  "nutrition": {
+    "calories": 280,
+    "protein": 38,
+    "carbs": 6,
+    "fat": 11
+  },
+  "image_url": "https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?w=800&q=80"
+},
+{
+  "_id": {
+    "$oid": "69124a750f431363af69d703"
+  },
+  "title": "Aloo Paratha",
+  "ingredients": [
+    "2 cups flour",
+    "3 boiled potatoes",
+    "1 onion",
+    "1 tsp cumin seeds",
+    "Butter"
+  ],
+  "instructions": "1. Mash potatoes with spices.\n2. Stuff into dough and roll parathas.\n3. Cook on tawa with butter.",
+  "tags": [
+    "vegetarian",
+    "north-indian",
+    "breakfast"
+  ],
+  "difficulty": "easy",
+  "prep_time": 15,
+  "cook_time": 15,
+  "servings": 2,
+  "nutrition": {
+    "calories": 380,
+    "protein": 9,
+    "carbs": 58,
+    "fat": 12
+  },
+  "image_url": "https://images.unsplash.com/photo-1589301773859-34462ea829e8?w=800&q=80"
+},
+{
+  "_id": {
+    "$oid": "69124a750f431363af69d704"
+  },
+  "title": "Pasta Alfredo",
+  "ingredients": [
+    "200g pasta",
+    "1 cup cream",
+    "2 tbsp butter",
+    "1/2 cup grated cheese",
+    "Garlic"
+  ],
+  "instructions": "1. Boil pasta.\n2. Heat butter, add garlic and cream.\n3. Add pasta and cheese. Mix well.",
+  "tags": [
+    "vegetarian",
+    "italian",
+    "main-course"
+  ],
+  "difficulty": "easy",
+  "prep_time": 10,
+  "cook_time": 15,
+  "servings": 2,
+  "nutrition": {
+    "calories": 680,
+    "protein": 18,
+    "carbs": 72,
+    "fat": 34
+  },
+  "image_url": "https://images.unsplash.com/photo-1645112411341-6c4fd023714a?w=800&q=80"
+},
+{
+  "_id": {
+    "$oid": "69124a750f431363af69d705"
+  },
+  "title": "Chocolate Brownie",
+  "ingredients": [
+    "1 cup flour",
+    "1/2 cup cocoa powder",
+    "1 cup sugar",
+    "2 eggs",
+    "1/2 cup butter"
+  ],
+  "instructions": "1. Mix all ingredients.\n2. Bake at 180°C for 25 minutes.",
+  "tags": [
+    "vegetarian",
+    "dessert",
+    "baking"
+  ],
+  "difficulty": "medium",
+  "prep_time": 10,
+  "cook_time": 25,
+  "servings": 6,
+  "nutrition": {
+    "calories": 320,
+    "protein": 5,
+    "carbs": 42,
+    "fat": 16
+  },
+  "image_url": "https://images.unsplash.com/photo-1606313564200-e75d5e30476c?w=800&q=80"
+},
+{
+  "_id": {
+    "$oid": "69124a750f431363af69d706"
+  },
+  "title": "Fish Curry",
+  "ingredients": [
+    "500g fish pieces",
+    "2 tomatoes",
+    "1 onion",
+    "2 tsp turmeric",
+    "1 tsp tamarind paste"
+  ],
+  "instructions": "1. Fry onions and tomatoes.\n2. Add spices and tamarind.\n3. Add fish and cook for 10 minutes.",
+  "tags": [
+    "non-vegetarian",
+    "indian",
+    "main-course"
+  ],
+  "difficulty": "medium",
+  "prep_time": 15,
+  "cook_time": 20,
+  "servings": 3,
+  "nutrition": {
+    "calories": 240,
+    "protein": 32,
+    "carbs": 12,
+    "fat": 8
+  },
+  "image_url": "https://images.unsplash.com/photo-1626074353765-517a681e40be?w=800&q=80"
+},
+{
+  "_id": {
+    "$oid": "69124a750f431363af69d707"
+  },
+  "title": "Vegetable Salad",
+  "ingredients": [
+    "1 cucumber",
+    "1 tomato",
+    "1 carrot",
+    "Lettuce",
+    "Salt and pepper",
+    "Lemon juice"
+  ],
+  "instructions": "1. Chop all vegetables.\n2. Add salt, pepper, and lemon juice.\n3. Toss and serve fresh.",
+  "tags": [
+    "vegetarian",
+    "healthy",
+    "quick"
+  ],
+  "difficulty": "easy",
+  "prep_time": 5,
+  "cook_time": 1,
+  "servings": 2,
+  "nutrition": {
+    "calories": 45,
+    "protein": 2,
+    "carbs": 10,
+    "fat": 0
+  },
+  "image_url": "https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=800&q=80"
+},
+{
+  "_id": {
+    "$oid": "69124a750f431363af69d708"
+  },
+  "title": "Dal Tadka",
+  "ingredients": [
+    "1 cup toor dal",
+    "1 onion",
+    "1 tomato",
+    "1 tsp cumin seeds",
+    "2 tsp ghee"
+  ],
+  "instructions": "1. Boil dal until soft.\n2. Prepare tempering with ghee, cumin, onion, tomato.\n3. Mix and simmer for 5 minutes.",
+  "tags": [
+    "vegetarian",
+    "indian",
+    "main-course"
+  ],
+  "difficulty": "easy",
+  "prep_time": 10,
+  "cook_time": 20,
+  "servings": 3,
+  "nutrition": {
+    "calories": 210,
+    "protein": 12,
+    "carbs": 32,
+    "fat": 4
+  },
+  "image_url": "https://images.unsplash.com/photo-1596797038530-2c107229654b?w=800&q=80"
+},
+{
+  "_id": {
+    "$oid": "69124a750f431363af69d709"
+  },
+  "title": "Paneer Tikka Roll",
+  "ingredients": [
+    "200g paneer",
+    "1 cup yogurt",
+    "1 onion",
+    "Roti wraps",
+    "1 tsp red chili powder"
+  ],
+  "instructions": "1. Marinate paneer with yogurt and spices.\n2. Grill and wrap in roti with onions.",
+  "tags": [
+    "vegetarian",
+    "snack",
+    "indian"
+  ],
+  "difficulty": "medium",
+  "prep_time": 15,
+  "cook_time": 15,
+  "servings": 2,
+  "nutrition": {
+    "calories": 420,
+    "protein": 18,
+    "carbs": 38,
+    "fat": 20
+  },
+  "image_url": "https://images.unsplash.com/photo-1601050690597-df02860c091d?w=800&q=80"
+},
+{
+  "_id": {
+    "$oid": "69124a750f431363af69d70a"
+  },
+  "title": "Fruit Smoothie",
+  "ingredients": [
+    "1 banana",
+    "1 cup strawberries",
+    "1 cup milk",
+    "Honey"
+  ],
+  "instructions": "1. Blend all ingredients until smooth.\n2. Serve chilled.",
+  "tags": [
+    "vegetarian",
+    "drink",
+    "healthy"
+  ],
+  "difficulty": "easy",
+  "prep_time": 5,
+  "cook_time": 1,
+  "servings": 1,
+  "nutrition": {
+    "calories": 220,
+    "protein": 8,
+    "carbs": 42,
+    "fat": 3
+  },
+  "image_url": "https://images.unsplash.com/photo-1505252585461-04db1eb84625?w=800&q=80"
+},
+{
+  "_id": {
+    "$oid": "69124a750f431363af69d70b"
+  },
+  "title": "Pav Bhaji",
+  "ingredients": [
+    "4 pav buns",
+    "2 potatoes",
+    "1 cup mixed vegetables",
+    "2 tsp pav bhaji masala",
+    "Butter"
+  ],
+  "instructions": "1. Boil and mash vegetables.\n2. Cook with masala and butter.\n3. Toast pav and serve.",
+  "tags": [
+    "vegetarian",
+    "mumbai-street-food",
+    "main-course"
+  ],
+  "difficulty": "medium",
+  "prep_time": 20,
+  "cook_time": 25,
+  "servings": 3,
+  "nutrition": {
+    "calories": 480,
+    "protein": 10,
+    "carbs": 62,
+    "fat": 18
+  },
+  "image_url": "https://images.unsplash.com/photo-1606491956689-2ea866880c84?w=800&q=80"
+},
+{
+  "_id": {
+    "$oid": "69124a750f431363af69d70c"
+  },
+  "title": "Idli Sambar",
+  "ingredients": [
+    "2 cups idli batter",
+    "1 cup toor dal",
+    "1 onion",
+    "1 tomato",
+    "Sambar masala"
+  ],
+  "instructions": "1. Steam idlis.\n2. Cook dal with sambar masala and vegetables.\n3. Serve idli with hot sambar.",
+  "tags": [
+    "vegetarian",
+    "south-indian",
+    "breakfast"
+  ],
+  "difficulty": "medium",
+  "prep_time": 15,
+  "cook_time": 25,
+  "servings": 3,
+  "nutrition": {
+    "calories": 290,
+    "protein": 11,
+    "carbs": 52,
+    "fat": 4
+  },
+  "image_url": "https://images.unsplash.com/photo-1630383249896-424e482df921?w=800&q=80"
+}]
