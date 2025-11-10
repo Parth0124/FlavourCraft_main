@@ -80,6 +80,24 @@ export interface CuisineCollection {
   };
 }
 
+export interface MultiUploadResult {
+  status: string;
+  total_images: number;
+  ingredients: string[];
+  image_urls_list: ImageUrls[];
+  details: {
+    total_detected: number;
+    unique_ingredients: number;
+  };
+}
+
+export interface ImageUrls {
+  url: string;           // Full size
+  thumbnail_url: string; // 150x150
+  medium_url: string;    // 500x500
+  public_id: string;
+}
+
 // Upload Types
 export interface IngredientDetectionResult {
   status: string;

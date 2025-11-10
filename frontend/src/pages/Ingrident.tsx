@@ -3,7 +3,9 @@ import RecipeGenerator from "@/components/Generator";
 import IngredientGrid from "@/components/IngridientsGrid";
 import { Camera, ChefHat, FileImage, Plus, Upload, X } from "lucide-react";
 import { useState } from "react";
-
+import { useImageUpload } from "@/hooks/useImageUpload";
+import { toast } from "react-hot-toast";
+import type { ImageUrls } from "@/types/api.types";
 
 // Define types
 interface IngredientUploadPageProps {
@@ -15,6 +17,7 @@ interface UploadedImage {
   file: File;
   preview: string;
   name: string;
+  cloudinaryUrls?: ImageUrls;
 }
 
 const IngredientUploadPage: React.FC<IngredientUploadPageProps> = ({
@@ -23,6 +26,10 @@ const IngredientUploadPage: React.FC<IngredientUploadPageProps> = ({
   const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
   const [dragActive, setDragActive] = useState(false);
   const [isGeneratingRecipe, setIsGeneratingRecipe] = useState(false);
+  const [detectedIngredients, setDetectedIngredients] = useState<string[]>([]);
+  const [allImageUrls, setAllImageUrls] = useState<ImageUrls[]>([]);
+  
+  const { uploadMultipleImages, loading: uploadLoading } = useImageUpload();
 
   // Drag handler
   const handleDrag = (e: React.DragEvent<HTMLDivElement>) => {
@@ -54,30 +61,76 @@ const IngredientUploadPage: React.FC<IngredientUploadPageProps> = ({
     }
   };
 
-  // File handler
-  const handleFiles = (files: FileList) => {
-    Array.from(files).forEach((file) => {
-      if (file.type.startsWith("image/")) {
-        const reader = new FileReader();
-        reader.onload = (event: ProgressEvent<FileReader>) => {
-          if (event.target?.result) {
-            const newImage: UploadedImage = {
-              id: Date.now() + Math.random(),
-              file,
-              preview: event.target.result as string,
-              name: file.name,
+  // File handler - now uploads to backend
+  const handleFiles = async (files: FileList) => {
+    const validFiles = Array.from(files).filter(file => file.type.startsWith("image/"));
+    
+    if (validFiles.length === 0) {
+      toast.error("Please upload valid image files");
+      return;
+    }
+
+    // Create preview images immediately for UX
+    const newImages: UploadedImage[] = validFiles.map(file => ({
+      id: Date.now() + Math.random(),
+      file,
+      preview: URL.createObjectURL(file),
+      name: file.name,
+    }));
+    
+    setUploadedImages(prev => [...prev, ...newImages]);
+
+    // Upload to backend
+    const uploadToast = toast.loading("Uploading and detecting ingredients...");
+    
+    try {
+      const result = await uploadMultipleImages(validFiles);
+      
+      // Update images with Cloudinary URLs
+      setUploadedImages(prev => 
+        prev.map((img, index) => {
+          const matchingIndex = prev.length - validFiles.length + index;
+          if (matchingIndex >= 0 && result.image_urls_list[matchingIndex]) {
+            return {
+              ...img,
+              cloudinaryUrls: result.image_urls_list[matchingIndex]
             };
-            setUploadedImages((prev) => [...prev, newImage]);
           }
-        };
-        reader.readAsDataURL(file);
-      }
-    });
+          return img;
+        })
+      );
+      
+      // Store all image URLs
+      setAllImageUrls(prev => [...prev, ...result.image_urls_list]);
+      
+      // Store detected ingredients (combine with existing)
+      setDetectedIngredients(prev => {
+        const combined = [...prev, ...result.ingredients];
+        return Array.from(new Set(combined)); // Remove duplicates
+      });
+      
+      toast.success(`Detected ${result.ingredients.length} ingredients!`, { id: uploadToast });
+    } catch (error) {
+      toast.error("Failed to upload images", { id: uploadToast });
+      console.error("Upload error:", error);
+    }
   };
 
   // Remove image
   const removeImage = (id: number) => {
-    setUploadedImages((prev) => prev.filter((img) => img.id !== id));
+    const imageIndex = uploadedImages.findIndex(img => img.id === id);
+    
+    if (imageIndex !== -1) {
+      // Remove the image's Cloudinary URLs from allImageUrls
+      const img = uploadedImages[imageIndex];
+      if (img.cloudinaryUrls) {
+        setAllImageUrls(prev => prev.filter(urls => urls.url !== img.cloudinaryUrls?.url));
+      }
+      
+      // Remove the image
+      setUploadedImages(prev => prev.filter(img => img.id !== id));
+      toast.success(`Removed: ${uploadedImages[imageIndex].name}`);
+    }
   };
 
   // Add more images
@@ -88,9 +141,15 @@ const IngredientUploadPage: React.FC<IngredientUploadPageProps> = ({
   // Generate recipe
   const generateRecipe = () => {
     if (uploadedImages.length === 0) {
-      alert("Please upload at least one ingredient image!");
+      toast.error("Please upload at least one ingredient image!");
       return;
     }
+    
+    if (detectedIngredients.length === 0) {
+      toast.error("No ingredients detected. Please try uploading clearer images.");
+      return;
+    }
+    
     setIsGeneratingRecipe(true);
   };
 
@@ -132,7 +191,11 @@ const IngredientUploadPage: React.FC<IngredientUploadPageProps> = ({
 
             {/* Right Side - Recipe Generator */}
             <div className="bg-white/50 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-              <RecipeGenerator ingredientCount={uploadedImages.length} />
+              <RecipeGenerator 
+                ingredientCount={uploadedImages.length}
+                detectedIngredients={detectedIngredients}
+                imageUrls={allImageUrls[0]} // Pass first image URLs (or you could combine them)
+              />
             </div>
           </div>
         </div>
@@ -169,7 +232,7 @@ const IngredientUploadPage: React.FC<IngredientUploadPageProps> = ({
             dragActive
               ? "border-orange-400 bg-orange-50"
               : "border-gray-300 hover:border-orange-400 hover:bg-orange-25"
-          }`}
+          } ${uploadLoading ? "opacity-50 pointer-events-none" : ""}`}
           onDragEnter={handleDrag}
           onDragLeave={handleDrag}
           onDragOver={handleDrag}
@@ -181,6 +244,7 @@ const IngredientUploadPage: React.FC<IngredientUploadPageProps> = ({
             accept="image/*"
             onChange={handleChange}
             className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+            disabled={uploadLoading}
           />
 
           <div className="space-y-4">
@@ -195,15 +259,17 @@ const IngredientUploadPage: React.FC<IngredientUploadPageProps> = ({
 
             <div>
               <h3 className="text-xl font-semibold text-gray-700 mb-2">
-                Drop your ingredient photos here
+                {uploadLoading ? "Uploading..." : "Drop your ingredient photos here"}
               </h3>
               <p className="text-gray-500 mb-4">
-                or click to browse from your device
+                {uploadLoading ? "Detecting ingredients..." : "or click to browse from your device"}
               </p>
               <div className="flex justify-center">
-                <span className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-orange-300 to-red-900 text-white rounded-xl font-medium hover:from-orange-600 hover:to-red-600 transition-all duration-200 cursor-pointer">
+                <span className={`inline-flex items-center px-6 py-3 bg-gradient-to-r from-orange-300 to-red-900 text-white rounded-xl font-medium transition-all duration-200 cursor-pointer ${
+                  uploadLoading ? "opacity-50" : "hover:from-orange-600 hover:to-red-600"
+                }`}>
                   <Upload className="w-5 h-5 mr-2" />
-                  Choose Photos
+                  {uploadLoading ? "Processing..." : "Choose Photos"}
                 </span>
               </div>
             </div>
@@ -214,6 +280,30 @@ const IngredientUploadPage: React.FC<IngredientUploadPageProps> = ({
           </div>
         </div>
 
+        {/* Detected Ingredients Badge */}
+        {detectedIngredients.length > 0 && (
+          <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-xl">
+            <h4 className="text-sm font-semibold text-green-800 mb-2">
+              Detected Ingredients ({detectedIngredients.length})
+            </h4>
+            <div className="flex flex-wrap gap-2">
+              {detectedIngredients.slice(0, 10).map((ingredient, idx) => (
+                <span
+                  key={idx}
+                  className="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs"
+                >
+                  {ingredient}
+                </span>
+              ))}
+              {detectedIngredients.length > 10 && (
+                <span className="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs">
+                  +{detectedIngredients.length - 10} more
+                </span>
+              )}
+            </div>
+          </div>
+        )}
+
         {/* Uploaded Images Grid */}
         {uploadedImages.length > 0 && (
           <div className="mb-8">
@@ -223,7 +313,12 @@ const IngredientUploadPage: React.FC<IngredientUploadPageProps> = ({
               </h3>
               <button
                 onClick={addMoreImages}
-                className="inline-flex items-center px-4 py-2 bg-white border-2 border-orange-300 text-orange-600 rounded-xl hover:bg-orange-50 transition-all duration-200"
+                disabled={uploadLoading}
+                className={`inline-flex items-center px-4 py-2 bg-white border-2 border-orange-300 text-orange-600 rounded-xl transition-all duration-200 ${
+                  uploadLoading 
+                    ? "opacity-50 cursor-not-allowed" 
+                    : "hover:bg-orange-50"
+                }`}
               >
                 <Plus className="w-4 h-4 mr-2" />
                 Add More
@@ -235,12 +330,20 @@ const IngredientUploadPage: React.FC<IngredientUploadPageProps> = ({
                 <div key={image.id} className="relative group">
                   <div className="aspect-square bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden hover:shadow-xl transition-all duration-300 relative group">
                     <img
-                      src={image.preview}
+                      src={image.cloudinaryUrls?.medium_url || image.preview}
                       alt={image.name}
                       className="w-full h-full object-cover"
                     />
+                    
+                    {/* Cloudinary badge */}
+                    {image.cloudinaryUrls && (
+                      <div className="absolute top-2 left-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full">
+                        ✓ Uploaded
+                      </div>
+                    )}
+                    
                     {/* Overlay only on hover */}
-                    <div className="absolute inset-0  bg-opacity-0 group-hover:bg-opacity-30 pointer-events-none transition-all duration-200"></div>
+                    <div className="absolute inset-0 bg-opacity-0 group-hover:bg-opacity-30 pointer-events-none transition-all duration-200"></div>
                   </div>
 
                   <button
@@ -263,9 +366,9 @@ const IngredientUploadPage: React.FC<IngredientUploadPageProps> = ({
         <div className="text-center">
           <button
             onClick={generateRecipe}
-            disabled={uploadedImages.length === 0}
+            disabled={uploadedImages.length === 0 || detectedIngredients.length === 0 || uploadLoading}
             className={`inline-flex items-center px-8 py-4 rounded-xl font-bold text-lg transition-all duration-200 ${
-              uploadedImages.length > 0
+              uploadedImages.length > 0 && detectedIngredients.length > 0 && !uploadLoading
                 ? "bg-gradient-to-r from-orange-300 to-red-900 text-white hover:from-orange-600 hover:to-red-600 transform hover:scale-105 shadow-lg"
                 : "bg-gray-300 text-gray-500 cursor-not-allowed"
             }`}
@@ -282,6 +385,12 @@ const IngredientUploadPage: React.FC<IngredientUploadPageProps> = ({
           {uploadedImages.length === 0 && (
             <p className="text-gray-500 mt-3">
               Upload ingredient photos to generate your recipe
+            </p>
+          )}
+          
+          {uploadedImages.length > 0 && detectedIngredients.length === 0 && !uploadLoading && (
+            <p className="text-orange-500 mt-3">
+              Waiting for ingredient detection...
             </p>
           )}
         </div>

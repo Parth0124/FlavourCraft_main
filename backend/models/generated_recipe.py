@@ -7,13 +7,32 @@ from datetime import datetime
 from bson import ObjectId
 
 
+class ImageUrls(BaseModel):
+    """Image URLs from Cloudinary"""
+    url: str  # Full-size image URL
+    thumbnail_url: str  # 200x200 thumbnail
+    medium_url: str  # 600x600 medium size
+    public_id: str  # Cloudinary public ID for deletion
+    
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "url": "https://res.cloudinary.com/demo/image/upload/sample.jpg",
+                "thumbnail_url": "https://res.cloudinary.com/demo/image/upload/c_thumb,w_200/sample.jpg",
+                "medium_url": "https://res.cloudinary.com/demo/image/upload/c_limit,w_600/sample.jpg",
+                "public_id": "ingredient_images/user_123/abc123"
+            }
+        }
+
+
 class GeneratedRecipeRequest(BaseModel):
     """Request schema for generating a recipe"""
     ingredients: List[str] = Field(..., min_items=2, max_items=50)
     dietary_preferences: Optional[List[str]] = Field(default_factory=list)
     cuisine_type: Optional[str] = None
-    cooking_time: Optional[int] = Field(None, gt=0, le=180)  # max 3 hours
+    cooking_time: Optional[int] = Field(None, gt=0, le=180)
     difficulty: Optional[str] = Field(None, pattern="^(easy|medium|hard)$")
+    image_urls: Optional[ImageUrls] = None
     
     class Config:
         json_schema_extra = {
@@ -53,24 +72,6 @@ class GeneratedRecipe(BaseModel):
                 "difficulty": "easy",
                 "tips": "Soaking rice ensures better texture. Add vegetables for extra nutrition.",
                 "servings": 4
-            }
-        }
-
-
-class ImageUrls(BaseModel):
-    """Image URLs from Cloudinary"""
-    url: str  # Full-size image URL
-    thumbnail_url: str  # 200x200 thumbnail
-    medium_url: str  # 600x600 medium size
-    public_id: str  # Cloudinary public ID for deletion
-    
-    class Config:
-        json_schema_extra = {
-            "example": {
-                "url": "https://res.cloudinary.com/demo/image/upload/sample.jpg",
-                "thumbnail_url": "https://res.cloudinary.com/demo/image/upload/c_thumb,w_200/sample.jpg",
-                "medium_url": "https://res.cloudinary.com/demo/image/upload/c_limit,w_600/sample.jpg",
-                "public_id": "ingredient_images/user_123/abc123"
             }
         }
 

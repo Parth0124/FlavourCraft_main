@@ -144,30 +144,25 @@ async def get_static_recipe(
 
 @router.post("/generate", response_model=GeneratedRecipeResponse, status_code=status.HTTP_201_CREATED)
 async def generate_recipe(
-    request: GeneratedRecipeRequest,
-    image_urls: Optional[Dict] = None,  # Accept image URLs from upload
+    request: GeneratedRecipeRequest,  # This will receive the entire body
     current_user: UserResponse = Depends(get_current_user),
     db: AsyncIOMotorDatabase = Depends(get_database)
 ):
     """
     Generate a new recipe using AI based on ingredients
-    
-    - **ingredients**: List of ingredients (2-20 items)
-    - **dietary_preferences**: Optional dietary restrictions (e.g., ["vegetarian", "gluten-free"])
-    - **cuisine_type**: Optional cuisine type (e.g., "indian", "italian")
-    - **cooking_time**: Optional maximum cooking time in minutes
-    - **difficulty**: Optional difficulty level (easy/medium/hard)
-    - **image_urls**: Optional image URLs from the upload endpoint
-    
-    Returns the generated recipe with ingredient image
     """
     try:
         recipe_service = RecipeGenerationService(db)
         
+        # Extract image_urls if present in the request
+        image_urls = None
+        if hasattr(request, 'image_urls') and request.image_urls:
+            image_urls = request.image_urls.model_dump() if hasattr(request.image_urls, 'model_dump') else dict(request.image_urls)
+        
         recipe = await recipe_service.generate_and_save_recipe(
             user_id=current_user.id,
             request=request,
-            image_urls=image_urls  # Pass image URLs to service
+            image_urls=image_urls
         )
         
         logger.info(f"Recipe generated for user {current_user.email}: {recipe.recipe.title}")
@@ -180,7 +175,6 @@ async def generate_recipe(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="An error occurred while generating the recipe"
         )
-
 
 @router.get("/history", response_model=RecipeHistoryResponse)
 async def get_recipe_history(

@@ -1,11 +1,13 @@
-import { Plus, X } from "lucide-react";
+import { Plus, X, ExternalLink } from "lucide-react";
 import { useState, useEffect } from "react";
+import type { ImageUrls } from "@/types/api.types";
 
 interface UploadedImage {
   id: number;
   file: File;
   preview: string;
   name: string;
+  cloudinaryUrls?: ImageUrls;  // NEW - Cloudinary URLs
 }
 
 interface IngredientGridProps {
@@ -21,6 +23,7 @@ const IngredientGrid: React.FC<IngredientGridProps> = ({
 }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [animatedItems, setAnimatedItems] = useState<Set<number>>(new Set());
+  const [lightboxImage, setLightboxImage] = useState<string | null>(null);
 
   // Trigger initial animation
   useEffect(() => {
@@ -50,6 +53,16 @@ const IngredientGrid: React.FC<IngredientGridProps> = ({
       }, index * 150);
     });
   }, [uploadedImages, animatedItems]);
+
+  // Open image in lightbox
+  const openLightbox = (imageUrl: string) => {
+    setLightboxImage(imageUrl);
+  };
+
+  // Close lightbox
+  const closeLightbox = () => {
+    setLightboxImage(null);
+  };
 
   return (
     <div className="h-full">
@@ -83,6 +96,9 @@ const IngredientGrid: React.FC<IngredientGridProps> = ({
       >
         {uploadedImages.map((image, index) => {
           const isAnimated = animatedItems.has(image.id);
+          // Use Cloudinary medium URL if available, otherwise use local preview
+          const displayUrl = image.cloudinaryUrls?.medium_url || image.preview;
+          const fullSizeUrl = image.cloudinaryUrls?.url || image.preview;
           
           return (
             <div 
@@ -96,14 +112,26 @@ const IngredientGrid: React.FC<IngredientGridProps> = ({
                 transitionDelay: isAnimated ? '0ms' : `${index * 100}ms`
               }}
             >
-              <div className="aspect-square bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden hover:shadow-xl transition-all duration-300 relative group hover:scale-105 hover:-translate-y-1">
+              <div 
+                className="aspect-square bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden hover:shadow-xl transition-all duration-300 relative group hover:scale-105 hover:-translate-y-1 cursor-pointer"
+                onClick={() => openLightbox(fullSizeUrl)}
+              >
                 <img
-                  src={image.preview}
+                  src={displayUrl}
                   alt={image.name}
                   className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
                 />
+                
+                {/* Cloudinary Badge */}
+                {image.cloudinaryUrls && (
+                  <div className="absolute top-2 left-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <ExternalLink className="w-3 h-3" />
+                    <span>Stored</span>
+                  </div>
+                )}
+                
                 {/* Animated overlay */}
-                <div className="absolute inset-0  bg-opacity-0 group-hover:bg-opacity-20 pointer-events-none transition-all duration-300 flex items-center justify-center">
+                <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 pointer-events-none transition-all duration-300 flex items-center justify-center">
                   <div className="transform scale-0 group-hover:scale-100 transition-transform duration-200 bg-white bg-opacity-20 rounded-full p-2">
                     <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
                   </div>
@@ -112,8 +140,11 @@ const IngredientGrid: React.FC<IngredientGridProps> = ({
 
               {/* Remove button with enhanced animation */}
               <button
-                onClick={() => onRemoveImage(image.id)}
-                className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1.5 opacity-0 group-hover:opacity-100 hover:bg-red-600 transition-all duration-200 transform hover:scale-110 hover:rotate-90 shadow-lg"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onRemoveImage(image.id);
+                }}
+                className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1.5 opacity-0 group-hover:opacity-100 hover:bg-red-600 transition-all duration-200 transform hover:scale-110 hover:rotate-90 shadow-lg z-10"
               >
                 <X className="w-3 h-3" />
               </button>
@@ -167,6 +198,27 @@ const IngredientGrid: React.FC<IngredientGridProps> = ({
           <div className="bg-gradient-to-r from-orange-400 to-red-500 text-white px-3 py-2 rounded-full text-xs font-medium shadow-lg animate-pulse">
             {uploadedImages.length} ready to cook!
           </div>
+        </div>
+      )}
+
+      {/* Lightbox Modal */}
+      {lightboxImage && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center p-4 animate-fadeIn"
+          onClick={closeLightbox}
+        >
+          <button
+            className="absolute top-4 right-4 text-white hover:text-gray-300 transition-colors"
+            onClick={closeLightbox}
+          >
+            <X className="w-8 h-8" />
+          </button>
+          <img
+            src={lightboxImage}
+            alt="Full size"
+            className="max-w-full max-h-full object-contain rounded-lg shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          />
         </div>
       )}
     </div>
