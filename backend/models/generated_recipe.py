@@ -126,6 +126,7 @@ class GeneratedRecipeResponse(BaseModel):
     created_at: datetime
     is_favorite: bool
     image_urls: Optional[ImageUrls] = None  # Include the ingredient image URLs
+    username: Optional[str] = None  # Username of the user who created the recipe
     
     class Config:
         json_schema_extra = {
@@ -147,7 +148,8 @@ class GeneratedRecipeResponse(BaseModel):
                     "thumbnail_url": "https://res.cloudinary.com/demo/image/upload/c_thumb,w_200/sample.jpg",
                     "medium_url": "https://res.cloudinary.com/demo/image/upload/c_limit,w_600/sample.jpg",
                     "public_id": "ingredient_images/user_123/abc123"
-                }
+                },
+                "username": "chef_john"
             }
         }
 

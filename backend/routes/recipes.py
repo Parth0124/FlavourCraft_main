@@ -144,7 +144,7 @@ async def get_static_recipe(
 
 @router.post("/generate", response_model=GeneratedRecipeResponse, status_code=status.HTTP_201_CREATED)
 async def generate_recipe(
-    request: GeneratedRecipeRequest,  # This will receive the entire body
+    request: GeneratedRecipeRequest,
     current_user: UserResponse = Depends(get_current_user),
     db: AsyncIOMotorDatabase = Depends(get_database)
 ):
@@ -161,6 +161,7 @@ async def generate_recipe(
         
         recipe = await recipe_service.generate_and_save_recipe(
             user_id=current_user.id,
+            username=current_user.username,
             request=request,
             image_urls=image_urls
         )
@@ -175,6 +176,39 @@ async def generate_recipe(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="An error occurred while generating the recipe"
         )
+
+
+@router.get("/generated", response_model=RecipeHistoryResponse)
+async def get_all_generated_recipes(
+    page: int = Query(1, ge=1),
+    page_size: int = Query(20, ge=1, le=100),
+    db: AsyncIOMotorDatabase = Depends(get_database)
+):
+    """
+    Get ALL generated recipes from ALL users (public access)
+    
+    - **page**: Page number (default: 1)
+    - **page_size**: Recipes per page (default: 20, max: 100)
+    
+    No authentication required - anyone can browse community recipes
+    """
+    try:
+        recipe_service = RecipeGenerationService(db)
+        
+        results = await recipe_service.get_all_generated_recipes(
+            page=page,
+            page_size=page_size
+        )
+        
+        return RecipeHistoryResponse(**results)
+        
+    except Exception as e:
+        logger.error(f"Error fetching all generated recipes: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="An error occurred while fetching recipes"
+        )
+
 
 @router.get("/history", response_model=RecipeHistoryResponse)
 async def get_recipe_history(
@@ -213,15 +247,14 @@ async def get_recipe_history(
 @router.get("/generated/{recipe_id}", response_model=GeneratedRecipeResponse)
 async def get_generated_recipe(
     recipe_id: str,
-    current_user: UserResponse = Depends(get_current_user),
     db: AsyncIOMotorDatabase = Depends(get_database)
 ):
     """
-    Get a specific generated recipe by ID
+    Get a specific generated recipe by ID (public access)
     
     - **recipe_id**: Generated recipe ID
     
-    Only the user who created the recipe can access it
+    No authentication required - anyone can view community recipes
     """
     try:
         from bson import ObjectId
@@ -230,8 +263,7 @@ async def get_generated_recipe(
         recipe_service = RecipeGenerationService(db)
         
         doc = await recipe_service.generated_recipes_collection.find_one({
-            "_id": ObjectId(recipe_id),
-            "user_id": current_user.id
+            "_id": ObjectId(recipe_id)
         })
         
         if not doc:
@@ -239,6 +271,10 @@ async def get_generated_recipe(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Recipe not found"
             )
+        
+        # Get username from users collection
+        user = await recipe_service.db.users.find_one({"_id": doc["user_id"]})
+        username = user.get("username", "Anonymous") if user else "Anonymous"
         
         # Parse image URLs if present
         image_urls = None
@@ -251,7 +287,8 @@ async def get_generated_recipe(
             ingredients_used=doc["ingredients"],
             created_at=doc["timestamp"],
             is_favorite=doc.get("is_favorite", False),
-            image_urls=image_urls
+            image_urls=image_urls,
+            username=username
         )
         
     except HTTPException:
@@ -345,7 +382,8 @@ async def get_favorite_recipes(
                 ingredients_used=doc["ingredients"],
                 created_at=doc["timestamp"],
                 is_favorite=True,
-                image_urls=image_urls
+                image_urls=image_urls,
+                username=current_user.username
             ))
         
         return RecipeHistoryResponse(

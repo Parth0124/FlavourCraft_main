@@ -50,12 +50,21 @@ export interface RecipeGenerationRequest {
   difficulty?: 'easy' | 'medium' | 'hard';
 }
 
+export interface ImageUrls {
+  url: string;           // Full size
+  thumbnail_url: string; // 150x150
+  medium_url: string;    // 500x500
+  public_id: string;
+}
+
 export interface GeneratedRecipeResponse {
   id: string;
   recipe: GeneratedRecipe;
   ingredients_used: string[];
   created_at: string;
   is_favorite: boolean;
+  image_urls?: ImageUrls;
+  username?: string;  // Username of the creator
 }
 
 // Cuisine Types
@@ -89,13 +98,6 @@ export interface MultiUploadResult {
     total_detected: number;
     unique_ingredients: number;
   };
-}
-
-export interface ImageUrls {
-  url: string;           // Full size
-  thumbnail_url: string; // 150x150
-  medium_url: string;    // 500x500
-  public_id: string;
 }
 
 // Upload Types

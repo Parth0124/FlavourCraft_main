@@ -22,6 +22,7 @@ import About from "./pages/About";
 import Blog from "./pages/Blog";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import StaticRecipes from "./pages/StaticRecipes";
+import BrowseRecipes from "./pages/PreviousRecepies";
 
 // Layout wrapper to handle conditional Footer
 const Layout = () => {
@@ -52,7 +53,8 @@ const Layout = () => {
         <Route path="/recipes" element={<StaticRecipes />} />
 
         {/* Protected Routes - Require Authentication */}
-        
+        <Route path="/browse" element={<BrowseRecipes />} />
+
         {/* Ingredient Upload Page */}
         <Route
           path="/upload"

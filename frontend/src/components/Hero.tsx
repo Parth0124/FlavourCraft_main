@@ -1,7 +1,9 @@
-
 import { ChefHat, BookOpen, Star, Clock } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const Hero = () => {
+  const navigate = useNavigate();
+
   return (
     <div className="relative pt-20 bg-gradient-to-b from-orange-50 to-white overflow-hidden">
       {/* Background Pattern */}
@@ -46,11 +48,17 @@ const Hero = () => {
 
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4">
-              <button className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-8 py-4 rounded-xl font-semibold hover:from-orange-600 hover:to-red-600 transform hover:scale-105 transition-all duration-200 shadow-xl flex items-center justify-center space-x-2">
+              <button 
+                onClick={() => navigate('/upload')}
+                className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-8 py-4 rounded-xl font-semibold hover:from-orange-600 hover:to-red-600 transform hover:scale-105 transition-all duration-200 shadow-xl flex items-center justify-center space-x-2"
+              >
                 <ChefHat className="w-5 h-5" />
                 <span>Start Cooking Now</span>
               </button>
-              <button className="border-2 border-orange-300 text-orange-600 px-8 py-4 rounded-xl font-semibold hover:bg-orange-50 transition-all duration-200 flex items-center justify-center space-x-2">
+              <button 
+                onClick={() => navigate('/browse')}
+                className="border-2 border-orange-300 text-orange-600 px-8 py-4 rounded-xl font-semibold hover:bg-orange-50 transition-all duration-200 flex items-center justify-center space-x-2"
+              >
                 <BookOpen className="w-5 h-5" />
                 <span>Browse Recipes</span>
               </button>

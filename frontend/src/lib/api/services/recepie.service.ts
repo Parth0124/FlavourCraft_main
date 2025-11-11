@@ -12,6 +12,15 @@ export const recipeService = {
     return response.data;
   },
 
+  // Public: Get ALL generated recipes from ALL users
+  async getAllGeneratedRecipes(page = 1, pageSize = 20) {
+    const response = await api.get('/recipes/generated', {
+      params: { page, page_size: pageSize }
+    });
+    return response.data;
+  },
+
+  // Authenticated: Get current user's history
   async getHistory(page = 1, pageSize = 10) {
     const response = await api.get('/recipes/history', {
       params: { page, page_size: pageSize }
@@ -19,6 +28,7 @@ export const recipeService = {
     return response.data;
   },
 
+  // Public: Get any generated recipe by ID
   async getGeneratedRecipe(id: string): Promise<GeneratedRecipeResponse> {
     const response = await api.get(`/recipes/generated/${id}`);
     return response.data;

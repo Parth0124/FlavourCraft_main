@@ -239,6 +239,7 @@ SERVINGS: [number of servings]
     async def generate_and_save_recipe(
         self,
         user_id: str,
+        username: str,
         request: GeneratedRecipeRequest,
         image_urls: Optional[Dict] = None
     ) -> GeneratedRecipeResponse:
@@ -247,6 +248,7 @@ SERVINGS: [number of servings]
         
         Args:
             user_id: User ID
+            username: Username
             request: Recipe generation request
             image_urls: Optional dictionary with image URLs from Cloudinary
             
@@ -296,8 +298,64 @@ SERVINGS: [number of servings]
             ingredients_used=request.ingredients,
             created_at=recipe_doc["timestamp"],
             is_favorite=False,
-            image_urls=parsed_image_urls
+            image_urls=parsed_image_urls,
+            username=username
         )
+    
+    async def get_all_generated_recipes(
+        self,
+        page: int = 1,
+        page_size: int = 20
+    ) -> Dict:
+        """
+        Get ALL generated recipes from ALL users (public access)
+        
+        Args:
+            page: Page number (1-indexed)
+            page_size: Number of recipes per page
+            
+        Returns:
+            Dictionary with recipes and pagination info
+        """
+        skip = (page - 1) * page_size
+        
+        # Get total count
+        total = await self.generated_recipes_collection.count_documents({})
+        
+        # Get recipes
+        cursor = self.generated_recipes_collection.find(
+            {}
+        ).sort("timestamp", -1).skip(skip).limit(page_size)
+        
+        from models.generated_recipe import ImageUrls
+        
+        recipes = []
+        async for doc in cursor:
+            # Get username from users collection
+            user = await self.db.users.find_one({"_id": doc["user_id"]})
+            username = user.get("username", "Anonymous") if user else "Anonymous"
+            
+            # Parse image URLs if present
+            image_urls = None
+            if doc.get("image_urls"):
+                image_urls = ImageUrls(**doc["image_urls"])
+            
+            recipes.append(GeneratedRecipeResponse(
+                id=str(doc["_id"]),
+                recipe=GeneratedRecipe(**doc["generated_recipe"]),
+                ingredients_used=doc["ingredients"],
+                created_at=doc["timestamp"],
+                is_favorite=doc.get("is_favorite", False),
+                image_urls=image_urls,
+                username=username
+            ))
+        
+        return {
+            "recipes": recipes,
+            "total": total,
+            "page": page,
+            "page_size": page_size
+        }
     
     async def get_user_recipe_history(
         self,
@@ -323,6 +381,10 @@ SERVINGS: [number of servings]
             {"user_id": user_id}
         )
         
+        # Get username
+        user = await self.db.users.find_one({"_id": user_id})
+        username = user.get("username", "Anonymous") if user else "Anonymous"
+        
         # Get recipes
         cursor = self.generated_recipes_collection.find(
             {"user_id": user_id}
@@ -343,7 +405,8 @@ SERVINGS: [number of servings]
                 ingredients_used=doc["ingredients"],
                 created_at=doc["timestamp"],
                 is_favorite=doc.get("is_favorite", False),
-                image_urls=image_urls
+                image_urls=image_urls,
+                username=username
             ))
         
         return {
