@@ -1,4 +1,4 @@
-import { Plus, X, ExternalLink } from "lucide-react";
+import { Plus, X, FileImage, ExternalLink, ZoomIn } from "lucide-react";
 import { useState, useEffect } from "react";
 import type { ImageUrls } from "@/types/api.types";
 
@@ -7,7 +7,7 @@ interface UploadedImage {
   file: File;
   preview: string;
   name: string;
-  cloudinaryUrls?: ImageUrls;  // NEW - Cloudinary URLs
+  cloudinaryUrls?: ImageUrls;
 }
 
 interface IngredientGridProps {
@@ -39,7 +39,7 @@ const IngredientGrid: React.FC<IngredientGridProps> = ({
       uploadedImages.forEach((image, index) => {
         setTimeout(() => {
           setAnimatedItems(prev => new Set([...prev, image.id]));
-        }, index * 150); // Stagger animation by 150ms
+        }, index * 150);
       });
     }
   }, [isVisible, uploadedImages]);
@@ -56,12 +56,20 @@ const IngredientGrid: React.FC<IngredientGridProps> = ({
 
   // Open image in lightbox
   const openLightbox = (imageUrl: string) => {
+    console.log("📸 Opening lightbox for:", imageUrl);
     setLightboxImage(imageUrl);
   };
 
   // Close lightbox
   const closeLightbox = () => {
     setLightboxImage(null);
+  };
+
+  // Format file size
+  const formatFileSize = (bytes: number): string => {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
   };
 
   return (
@@ -86,9 +94,9 @@ const IngredientGrid: React.FC<IngredientGridProps> = ({
         </button>
       </div>
 
-      {/* Grid with staggered animations */}
+      {/* Grid with attachment-style cards */}
       <div 
-        className={`grid grid-cols-2 lg:grid-cols-3 gap-4 max-h-[70vh] overflow-y-auto pr-2 transform transition-all duration-500 ease-out ${
+        className={`space-y-3 max-h-[70vh] overflow-y-auto pr-2 transform transition-all duration-500 ease-out ${
           isVisible 
             ? 'translate-y-0 opacity-100' 
             : 'translate-y-8 opacity-0'
@@ -96,9 +104,8 @@ const IngredientGrid: React.FC<IngredientGridProps> = ({
       >
         {uploadedImages.map((image, index) => {
           const isAnimated = animatedItems.has(image.id);
-          // Use Cloudinary medium URL if available, otherwise use local preview
-          const displayUrl = image.cloudinaryUrls?.medium_url || image.preview;
           const fullSizeUrl = image.cloudinaryUrls?.url || image.preview;
+          const fileSize = formatFileSize(image.file.size);
           
           return (
             <div 
@@ -112,55 +119,78 @@ const IngredientGrid: React.FC<IngredientGridProps> = ({
                 transitionDelay: isAnimated ? '0ms' : `${index * 100}ms`
               }}
             >
-              <div 
-                className="aspect-square bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden hover:shadow-xl transition-all duration-300 relative group hover:scale-105 hover:-translate-y-1 cursor-pointer"
-                onClick={() => openLightbox(fullSizeUrl)}
-              >
-                <img
-                  src={displayUrl}
-                  alt={image.name}
-                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-                />
-                
-                {/* Cloudinary Badge */}
-                {image.cloudinaryUrls && (
-                  <div className="absolute top-2 left-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <ExternalLink className="w-3 h-3" />
-                    <span>Stored</span>
+              {/* Attachment Card - Email/Gmail style */}
+              <div className="bg-white rounded-lg border-2 border-gray-200 p-4 hover:border-orange-300 hover:shadow-md transition-all duration-200">
+                <div className="flex items-center gap-4">
+                  {/* File Icon */}
+                  <div className="flex-shrink-0">
+                    <div className="w-12 h-12 bg-gradient-to-br from-orange-100 to-red-100 rounded-lg flex items-center justify-center">
+                      <FileImage className="w-6 h-6 text-orange-600" />
+                    </div>
                   </div>
-                )}
-                
-                {/* Animated overlay */}
-                <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 pointer-events-none transition-all duration-300 flex items-center justify-center">
-                  <div className="transform scale-0 group-hover:scale-100 transition-transform duration-200 bg-white bg-opacity-20 rounded-full p-2">
-                    <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+
+                  {/* File Info */}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-gray-800 truncate">
+                      {image.name}
+                    </p>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className="text-xs text-gray-500">{fileSize}</span>
+                      {image.cloudinaryUrls && (
+                        <>
+                          <span className="text-xs text-gray-300">•</span>
+                          <div className="flex items-center gap-1">
+                            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                            <span className="text-xs text-green-600 font-medium">Uploaded</span>
+                          </div>
+                        </>
+                      )}
+                      {!image.cloudinaryUrls && (
+                        <>
+                          <span className="text-xs text-gray-300">•</span>
+                          <div className="flex items-center gap-1">
+                            <div className="w-2 h-2 bg-yellow-500 rounded-full animate-pulse"></div>
+                            <span className="text-xs text-yellow-600 font-medium">Uploading...</span>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex items-center gap-2">
+                    {/* View Button */}
+                    <button
+                      onClick={() => openLightbox(fullSizeUrl)}
+                      className="p-2 rounded-lg bg-orange-50 text-orange-600 hover:bg-orange-100 transition-colors"
+                      title="View image"
+                    >
+                      <ZoomIn className="w-4 h-4" />
+                    </button>
+
+                    {/* Remove Button */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onRemoveImage(image.id);
+                      }}
+                      className="p-2 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition-colors"
+                      title="Remove image"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
                   </div>
                 </div>
-              </div>
 
-              {/* Remove button with enhanced animation */}
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onRemoveImage(image.id);
-                }}
-                className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1.5 opacity-0 group-hover:opacity-100 hover:bg-red-600 transition-all duration-200 transform hover:scale-110 hover:rotate-90 shadow-lg z-10"
-              >
-                <X className="w-3 h-3" />
-              </button>
-
-              {/* Filename with slide-up animation */}
-              <p className={`mt-2 text-sm text-gray-600 truncate text-center transform transition-all duration-300 ${
-                isAnimated 
-                  ? 'translate-y-0 opacity-100' 
-                  : 'translate-y-2 opacity-0'
-              }`}>
-                {image.name}
-              </p>
-
-              {/* Subtle pulse animation on hover */}
-              <div className="absolute inset-0 rounded-xl border-2 border-transparent group-hover:border-orange-200 transition-all duration-300 pointer-events-none">
-                <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-orange-100 to-red-100 opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
+                {/* Cloudinary URL indicator (hover to show) */}
+                {image.cloudinaryUrls && (
+                  <div className="mt-3 pt-3 border-t border-gray-100 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="flex items-center gap-2 text-xs text-gray-500">
+                      <ExternalLink className="w-3 h-3" />
+                      <span className="truncate">Stored in cloud</span>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           );
@@ -208,19 +238,43 @@ const IngredientGrid: React.FC<IngredientGridProps> = ({
           onClick={closeLightbox}
         >
           <button
-            className="absolute top-4 right-4 text-white hover:text-gray-300 transition-colors"
+            className="absolute top-4 right-4 text-white hover:text-gray-300 transition-colors z-50"
             onClick={closeLightbox}
           >
             <X className="w-8 h-8" />
           </button>
-          <img
-            src={lightboxImage}
-            alt="Full size"
-            className="max-w-full max-h-full object-contain rounded-lg shadow-2xl"
-            onClick={(e) => e.stopPropagation()}
-          />
+          <div className="relative max-w-5xl max-h-[90vh]">
+            <img
+              src={lightboxImage}
+              alt="Full size"
+              className="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+              onError={(e) => {
+                console.error("❌ Lightbox image failed to load:", lightboxImage);
+              }}
+              onLoad={() => {
+                console.log("✅ Lightbox image loaded:", lightboxImage);
+              }}
+            />
+          </div>
         </div>
       )}
+
+      {/* CSS for fadeIn animation */}
+      <style>{`
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
+        }
+        
+        .animate-fadeIn {
+          animation: fadeIn 0.3s ease-in-out;
+        }
+      `}</style>
     </div>
   );
 };

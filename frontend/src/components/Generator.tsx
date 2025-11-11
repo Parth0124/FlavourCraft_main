@@ -19,12 +19,12 @@ import type { ImageUrls, GeneratedRecipeResponse } from "@/types/api.types";
 interface RecipeGeneratorProps {
   ingredientCount: number;
   detectedIngredients: string[];
-  imageUrls?: ImageUrls;  // Ingredient image URLs from Cloudinary
+  imageUrls?: ImageUrls;
 }
 
 const RecipeGenerator: React.FC<RecipeGeneratorProps> = ({
   ingredientCount,
-  detectedIngredients = [],  // Add default empty array
+  detectedIngredients = [],
   imageUrls
 }) => {
   const [ingredients, setIngredients] = useState<string[]>([]);
@@ -32,7 +32,7 @@ const RecipeGenerator: React.FC<RecipeGeneratorProps> = ({
   const [cuisineType, setCuisineType] = useState("");
   const [difficulty, setDifficulty] = useState<"easy" | "medium" | "hard" | "">("");
   const [cookingTime, setCookingTime] = useState<number | "">("");
-  const [dietaryPreferences, setDietaryPreferences] = useState<string[]>([]);
+  const [dietaryPreferencesText, setDietaryPreferencesText] = useState("");
   const [recipe, setRecipe] = useState<GeneratedRecipeResponse | null>(null);
 
   const { generateRecipe, toggleFavorite, loading, error } = useRecipeGeneration();
@@ -43,6 +43,11 @@ const RecipeGenerator: React.FC<RecipeGeneratorProps> = ({
       setIngredients(detectedIngredients);
     }
   }, [detectedIngredients]);
+
+  // Debug: Log when imageUrls prop changes
+  useEffect(() => {
+    console.log("📸 RecipeGenerator received imageUrls:", imageUrls);
+  }, [imageUrls]);
 
   // Add ingredient
   const addIngredient = () => {
@@ -59,16 +64,7 @@ const RecipeGenerator: React.FC<RecipeGeneratorProps> = ({
     toast.success(`Removed: ${ingredient}`);
   };
 
-  // Toggle dietary preference
-  const toggleDietary = (pref: string) => {
-    if (dietaryPreferences.includes(pref)) {
-      setDietaryPreferences(dietaryPreferences.filter(p => p !== pref));
-    } else {
-      setDietaryPreferences([...dietaryPreferences, pref]);
-    }
-  };
-
-  // Generate the recipe
+  // Generate the recipe with image URLs
   const handleGenerateRecipe = async () => {
     if (ingredients.length === 0) {
       toast.error("Please add at least one ingredient");
@@ -78,45 +74,65 @@ const RecipeGenerator: React.FC<RecipeGeneratorProps> = ({
     const toastId = toast.loading("Generating your recipe...");
 
     try {
-      // Build request data with proper types
-      const requestData: any = {
-        ingredients: ingredients.filter(i => i && i.trim()) // Remove empty ingredients
-      };
+      console.log("🚀 RecipeGenerator - Starting generation");
+      console.log("   Ingredients:", ingredients);
+      console.log("   Image URLs prop:", imageUrls);
       
-      // Add optional fields only if they have values
-      if (cuisineType && cuisineType.trim()) {
-        requestData.cuisine_type = cuisineType.toLowerCase().trim();
-      }
-      
-      if (difficulty) {
-        requestData.difficulty = difficulty.toLowerCase();
-      }
-      
-      if (cookingTime && Number(cookingTime) > 0) {
-        requestData.cooking_time = Number(cookingTime);
-      }
-      
-      if (dietaryPreferences.length > 0) {
-        requestData.dietary_preferences = dietaryPreferences.filter(p => p && p.trim());
-      }
-
-      console.log("Sending recipe generation request:", requestData);
-
-      // Build clean options object without undefined values
+      // Build options object
       const options: any = {};
-      if (requestData.cuisine_type) options.cuisine_type = requestData.cuisine_type;
-      if (requestData.difficulty) options.difficulty = requestData.difficulty;
-      if (requestData.cooking_time) options.cooking_time = requestData.cooking_time;
-      if (requestData.dietary_preferences) options.dietary_preferences = requestData.dietary_preferences;
+      
+      // Add cuisine type if provided
+      if (cuisineType && cuisineType.trim()) {
+        options.cuisine_type = cuisineType.trim();
+      }
+      
+      // Add difficulty if selected
+      if (difficulty) {
+        options.difficulty = difficulty.toLowerCase() as 'easy' | 'medium' | 'hard';
+      }
+      
+      // Add cooking time if provided
+      if (cookingTime && Number(cookingTime) > 0) {
+        options.cooking_time = Number(cookingTime);
+      }
+      
+      // ✅ Parse comma-separated dietary preferences
+      if (dietaryPreferencesText && dietaryPreferencesText.trim()) {
+        const preferences = dietaryPreferencesText
+          .split(',')
+          .map(p => p.trim())
+          .filter(p => p.length > 0);
+        
+        if (preferences.length > 0) {
+          options.dietary_preferences = preferences;
+          console.log("   ✅ Parsed dietary preferences:", preferences);
+        }
+      }
 
-      const generatedRecipe = await generateRecipe(requestData.ingredients, options);
+      // ✅ Add image URLs to options if available
+      if (imageUrls) {
+        options.image_urls = imageUrls;
+        console.log("   ✅ Including image URLs in options:", imageUrls);
+      } else {
+        console.warn("   ⚠️  No image URLs available to include");
+      }
+
+      console.log("📤 RecipeGenerator - Calling generateRecipe with:");
+      console.log("   Ingredients:", ingredients);
+      console.log("   Options:", options);
+
+      // Call hook with ingredients and options
+      const generatedRecipe = await generateRecipe(ingredients, options);
+
+      console.log("📥 RecipeGenerator - Recipe generated:", generatedRecipe);
+      console.log("   Recipe ID:", generatedRecipe.id);
+      console.log("   Image URLs in response:", generatedRecipe.image_urls);
 
       setRecipe(generatedRecipe);
       toast.success("Recipe generated successfully!", { id: toastId });
     } catch (err: any) {
-      console.error("Generation error:", err);
-      console.error("Error response data:", err.response?.data);
-      console.error("Full error details:", JSON.stringify(err.response?.data, null, 2));
+      console.error("❌ RecipeGenerator - Generation error:", err);
+      console.error("   Error response:", err.response?.data);
       
       // Extract error message
       let errorMsg = "Failed to generate recipe";
@@ -125,7 +141,6 @@ const RecipeGenerator: React.FC<RecipeGeneratorProps> = ({
         if (typeof data.detail === 'string') {
           errorMsg = data.detail;
         } else if (Array.isArray(data.detail)) {
-          // FastAPI validation errors
           errorMsg = data.detail.map((e: any) => {
             if (e.msg && e.loc) {
               return `${e.loc.join('.')}: ${e.msg}`;
@@ -164,17 +179,8 @@ const RecipeGenerator: React.FC<RecipeGeneratorProps> = ({
     setCuisineType("");
     setDifficulty("");
     setCookingTime("");
-    setDietaryPreferences([]);
+    setDietaryPreferencesText("");
   };
-
-  const cuisineOptions = [
-    "Italian", "Mexican", "Chinese", "Indian", "Japanese", 
-    "Thai", "French", "Mediterranean", "American", "Korean"
-  ];
-
-  const dietaryOptions = [
-    "Vegetarian", "Vegan", "Gluten-Free", "Dairy-Free", "Low-Carb", "Keto"
-  ];
 
   // If recipe is generated, show the recipe
   if (recipe) {
@@ -206,13 +212,20 @@ const RecipeGenerator: React.FC<RecipeGeneratorProps> = ({
           </div>
         </div>
 
-        {/* Ingredient Image (if available) */}
+        {/* Ingredient Image */}
         {recipe.image_urls && (
           <div className="mb-6 rounded-xl overflow-hidden shadow-lg">
             <img 
               src={recipe.image_urls.medium_url} 
               alt="Ingredients" 
               className="w-full h-48 object-cover"
+              onError={(e) => {
+                console.error("❌ Failed to load image:", recipe.image_urls?.medium_url);
+                e.currentTarget.style.display = 'none';
+              }}
+              onLoad={() => {
+                console.log("✅ Image loaded successfully:", recipe.image_urls?.medium_url);
+              }}
             />
             <div className="bg-white p-2 text-xs text-gray-500 text-center">
               Your ingredients
@@ -297,6 +310,21 @@ const RecipeGenerator: React.FC<RecipeGeneratorProps> = ({
         Customize Your Recipe
       </h2>
 
+      {/* Image URL status */}
+      {imageUrls && (
+        <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg text-xs">
+          <p className="text-green-800 font-medium">✅ Image ready for recipe</p>
+          <p className="text-green-600 mt-1 truncate">URL: {imageUrls.medium_url}</p>
+        </div>
+      )}
+
+      {!imageUrls && (
+        <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg text-xs">
+          <p className="text-blue-800 font-medium">ℹ️ No ingredient image attached</p>
+          <p className="text-blue-600 mt-1">Recipe will be generated without image</p>
+        </div>
+      )}
+
       {/* Ingredients Section */}
       <div className="mb-6">
         <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -339,21 +367,21 @@ const RecipeGenerator: React.FC<RecipeGeneratorProps> = ({
         </div>
       </div>
 
-      {/* Cuisine Type */}
+      {/* ✅ CHANGED: Cuisine Type - Text Input */}
       <div className="mb-6">
         <label className="block text-sm font-medium text-gray-700 mb-2">
           Cuisine Type (Optional)
         </label>
-        <select
+        <input
+          type="text"
           value={cuisineType}
           onChange={(e) => setCuisineType(e.target.value)}
+          placeholder="e.g., Italian, Mexican, Indian, Thai"
           className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-        >
-          <option value="">Any Cuisine</option>
-          {cuisineOptions.map(cuisine => (
-            <option key={cuisine} value={cuisine.toLowerCase()}>{cuisine}</option>
-          ))}
-        </select>
+        />
+        <p className="text-xs text-gray-500 mt-1">
+          Enter any cuisine type you prefer
+        </p>
       </div>
 
       {/* Difficulty */}
@@ -397,26 +425,39 @@ const RecipeGenerator: React.FC<RecipeGeneratorProps> = ({
         </div>
       </div>
 
-      {/* Dietary Preferences */}
+      {/* ✅ CHANGED: Dietary Preferences - Text Input with comma separation */}
       <div className="mb-6">
         <label className="block text-sm font-medium text-gray-700 mb-2">
           Dietary Preferences (Optional)
         </label>
-        <div className="flex flex-wrap gap-2">
-          {dietaryOptions.map((pref) => (
-            <button
-              key={pref}
-              onClick={() => toggleDietary(pref)}
-              className={`px-3 py-1 rounded-full text-sm font-medium transition-all ${
-                dietaryPreferences.includes(pref)
-                  ? "bg-gradient-to-r from-orange-300 to-red-900 text-white"
-                  : "bg-white border border-gray-300 text-gray-700 hover:border-orange-300"
-              }`}
-            >
-              {pref}
-            </button>
-          ))}
-        </div>
+        <input
+          type="text"
+          value={dietaryPreferencesText}
+          onChange={(e) => setDietaryPreferencesText(e.target.value)}
+          placeholder="e.g., Vegetarian, Vegan, Gluten-Free, Dairy-Free"
+          className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+        />
+        <p className="text-xs text-gray-500 mt-1">
+          Separate multiple preferences with commas
+        </p>
+        
+        {/* Preview of parsed preferences */}
+        {dietaryPreferencesText && dietaryPreferencesText.trim() && (
+          <div className="mt-2 flex flex-wrap gap-2">
+            {dietaryPreferencesText
+              .split(',')
+              .map(p => p.trim())
+              .filter(p => p.length > 0)
+              .map((pref, idx) => (
+                <span 
+                  key={idx}
+                  className="px-2 py-1 bg-orange-100 text-orange-700 rounded-full text-xs"
+                >
+                  {pref}
+                </span>
+              ))}
+          </div>
+        )}
       </div>
 
       {/* Generate Button */}

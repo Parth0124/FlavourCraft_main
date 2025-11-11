@@ -1,6 +1,6 @@
 """
-Cloudinary image hosting service
-Handles uploading and managing images on Cloudinary
+Cloudinary image hosting service - FIXED VERSION
+Handles uploading and managing images on Cloudinary with proper transformations
 """
 import cloudinary
 import cloudinary.uploader
@@ -47,7 +47,7 @@ class CloudinaryService:
         folder: str = "ingredient_images"
     ) -> Optional[Dict[str, str]]:
         """
-        Upload image to Cloudinary
+        Upload image to Cloudinary with optimized transformations
         
         Args:
             image_bytes: Image content as bytes
@@ -57,12 +57,6 @@ class CloudinaryService:
             
         Returns:
             Dictionary with image URLs or None if upload fails
-            {
-                "url": "https://res.cloudinary.com/.../image.jpg",
-                "secure_url": "https://res.cloudinary.com/.../image.jpg",
-                "public_id": "ingredient_images/user_123/abc123",
-                "thumbnail_url": "https://res.cloudinary.com/.../c_thumb,w_200/image.jpg"
-            }
         """
         if not self.is_configured:
             logger.warning("Cloudinary not configured - skipping upload")
@@ -84,41 +78,63 @@ class CloudinaryService:
             # Construct public_id: folder/user_id/unique_id
             public_id = f"{folder}/{user_id}/{unique_id}"
             
-            logger.info(f"Uploading image to Cloudinary: {public_id}")
+            logger.info(f"📤 Uploading image to Cloudinary: {public_id}")
             
-            # Upload to Cloudinary
+            # ✅ FIX: Upload with eager transformations to generate URLs immediately
             upload_result = cloudinary.uploader.upload(
                 image_bytes,
                 public_id=public_id,
                 folder=folder,
                 resource_type="image",
                 overwrite=False,
-                quality="auto",  # Automatic quality optimization
-                fetch_format="auto",  # Automatic format optimization
-                tags=[user_id, "ingredient"]  # Add tags for easy filtering
+                quality="auto:good",  # Better quality than just "auto"
+                fetch_format="auto",
+                tags=[user_id, "ingredient"],
+                # ✅ Generate transformations eagerly so they're ready immediately
+                eager=[
+                    # Thumbnail: 200x200 crop with face/auto focus
+                    {
+                        "width": 200,
+                        "height": 200,
+                        "crop": "fill",  # Changed from "thumb" to "fill"
+                        "gravity": "auto",
+                        "quality": "auto:good",
+                        "fetch_format": "auto"
+                    },
+                    # Medium: 600x600 limit
+                    {
+                        "width": 600,
+                        "height": 600,
+                        "crop": "limit",
+                        "quality": "auto:good",
+                        "fetch_format": "auto"
+                    }
+                ],
+                eager_async=False,  # Wait for transformations to complete
             )
             
             # Extract URLs
             secure_url = upload_result.get("secure_url")
             public_id_full = upload_result.get("public_id")
             
-            # Generate thumbnail URL (200x200)
-            thumbnail_url = cloudinary.CloudinaryImage(public_id_full).build_url(
-                transformation=[
-                    {"width": 200, "height": 200, "crop": "thumb", "gravity": "auto"},
-                    {"quality": "auto", "fetch_format": "auto"}
-                ]
-            )
+            logger.info(f"✅ Image uploaded successfully")
+            logger.info(f"   Public ID: {public_id_full}")
+            logger.info(f"   URL: {secure_url}")
             
-            # Generate medium-sized URL (600x600)
-            medium_url = cloudinary.CloudinaryImage(public_id_full).build_url(
-                transformation=[
-                    {"width": 600, "height": 600, "crop": "limit"},
-                    {"quality": "auto", "fetch_format": "auto"}
-                ]
-            )
+            # ✅ FIX: Build transformation URLs manually for consistency
+            # This ensures they match the eager transformations
+            base_url = f"https://res.cloudinary.com/{settings.CLOUDINARY_CLOUD_NAME}/image/upload"
             
-            logger.info(f"✅ Image uploaded successfully: {secure_url}")
+            # Thumbnail URL with fill crop (better than thumb for grid display)
+            thumbnail_url = f"{base_url}/c_fill,g_auto,h_200,w_200,q_auto:good,f_auto/{public_id_full}"
+            
+            # Medium URL with limit crop
+            medium_url = f"{base_url}/c_limit,h_600,w_600,q_auto:good,f_auto/{public_id_full}"
+            
+            logger.info(f"📸 Generated URLs:")
+            logger.info(f"   Full: {secure_url}")
+            logger.info(f"   Medium: {medium_url}")
+            logger.info(f"   Thumbnail: {thumbnail_url}")
             
             return {
                 "url": secure_url,
@@ -133,7 +149,9 @@ class CloudinaryService:
             }
             
         except Exception as e:
-            logger.error(f"Failed to upload image to Cloudinary: {str(e)}")
+            logger.error(f"❌ Failed to upload image to Cloudinary: {str(e)}")
+            import traceback
+            logger.error(traceback.format_exc())
             return None
     
     async def delete_image(self, public_id: str) -> bool:
@@ -156,11 +174,11 @@ class CloudinaryService:
                 logger.info(f"✅ Image deleted from Cloudinary: {public_id}")
                 return True
             else:
-                logger.warning(f"Failed to delete image: {result}")
+                logger.warning(f"⚠️  Failed to delete image: {result}")
                 return False
                 
         except Exception as e:
-            logger.error(f"Error deleting image from Cloudinary: {str(e)}")
+            logger.error(f"❌ Error deleting image from Cloudinary: {str(e)}")
             return False
     
     async def get_user_images(self, user_id: str, max_results: int = 100) -> list:
@@ -187,7 +205,7 @@ class CloudinaryService:
             return result.get("resources", [])
             
         except Exception as e:
-            logger.error(f"Error fetching user images: {str(e)}")
+            logger.error(f"❌ Error fetching user images: {str(e)}")
             return []
 
 

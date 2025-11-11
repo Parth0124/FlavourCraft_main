@@ -288,7 +288,9 @@ async def get_generated_recipe(
             created_at=doc["timestamp"],
             is_favorite=doc.get("is_favorite", False),
             image_urls=image_urls,
-            username=username
+            username=username,
+            cuisine_type=doc.get("cuisine_type", ""),
+            dietary_preferences=", ".join(doc.get("dietary_preferences", []))
         )
         
     except HTTPException:
@@ -383,7 +385,9 @@ async def get_favorite_recipes(
                 created_at=doc["timestamp"],
                 is_favorite=True,
                 image_urls=image_urls,
-                username=current_user.username
+                username=current_user.username,
+                cuisine_type=doc.get("cuisine_type", ""),
+                dietary_preferences=", ".join(doc.get("dietary_preferences", []))
             ))
         
         return RecipeHistoryResponse(

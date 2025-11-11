@@ -299,7 +299,9 @@ SERVINGS: [number of servings]
             created_at=recipe_doc["timestamp"],
             is_favorite=False,
             image_urls=parsed_image_urls,
-            username=username
+            username=username,
+            cuisine_type=request.cuisine_type or "",
+            dietary_preferences=request.dietary_preferences or []
         )
     
     async def get_all_generated_recipes(
@@ -347,7 +349,9 @@ SERVINGS: [number of servings]
                 created_at=doc["timestamp"],
                 is_favorite=doc.get("is_favorite", False),
                 image_urls=image_urls,
-                username=username
+                username=username,
+                cuisine_type=doc.get("cuisine_type", ""),
+                dietary_preferences=doc.get("dietary_preferences", [])
             ))
         
         return {
@@ -406,7 +410,9 @@ SERVINGS: [number of servings]
                 created_at=doc["timestamp"],
                 is_favorite=doc.get("is_favorite", False),
                 image_urls=image_urls,
-                username=username
+                username=username,
+                cuisine_type=doc.get("cuisine_type", ""),
+                dietary_preferences=doc.get("dietary_preferences", [])
             ))
         
         return {

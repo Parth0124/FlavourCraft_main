@@ -127,6 +127,8 @@ class GeneratedRecipeResponse(BaseModel):
     is_favorite: bool
     image_urls: Optional[ImageUrls] = None  # Include the ingredient image URLs
     username: Optional[str] = None  # Username of the user who created the recipe
+    cuisine_type: Optional[str] = None  # Cuisine type
+    dietary_preferences: List[str] = Field(default_factory=list)  # Dietary preferences as array
     
     class Config:
         json_schema_extra = {

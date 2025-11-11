@@ -6,9 +6,21 @@ import type {
 } from '../../../types/api.types';
 
 export const recipeService = {
-  // Generated Recipes
+  // ✅ Generated Recipes - properly sends all data including image_urls
   async generateRecipe(data: RecipeGenerationRequest): Promise<GeneratedRecipeResponse> {
+    console.log("📤 API Service: Sending recipe generation request:", data);
+    
+    // ✅ Verify image_urls are present
+    if (data.image_urls) {
+      console.log("✅ API Service: image_urls included in request:", data.image_urls);
+    } else {
+      console.warn("⚠️  API Service: No image_urls in request");
+    }
+    
     const response = await api.post('/recipes/generate', data);
+    
+    console.log("📥 API Service: Received response:", response.data);
+    
     return response.data;
   },
 

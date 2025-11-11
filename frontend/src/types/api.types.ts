@@ -42,18 +42,20 @@ export interface GeneratedRecipe {
   servings: number;
 }
 
+// ✅ FIXED: Added image_urls field
 export interface RecipeGenerationRequest {
   ingredients: string[];
   dietary_preferences?: string[];
   cuisine_type?: string;
   cooking_time?: number;
   difficulty?: 'easy' | 'medium' | 'hard';
+  image_urls?: ImageUrls;  // ✅ NEW - Include image URLs in request
 }
 
 export interface ImageUrls {
   url: string;           // Full size
-  thumbnail_url: string; // 150x150
-  medium_url: string;    // 500x500
+  thumbnail_url: string; // 200x200
+  medium_url: string;    // 600x600
   public_id: string;
 }
 
@@ -64,6 +66,8 @@ export interface GeneratedRecipeResponse {
   created_at: string;
   is_favorite: boolean;
   image_urls?: ImageUrls;
+  cuisine_type?: string;  // ✅ FIXED: Added cuisine_type
+  dietary_preferences?: string[];  // ✅ FIXED: Changed from string to string[]
   username?: string;  // Username of the creator
 }
 
