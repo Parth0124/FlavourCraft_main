@@ -1,0 +1,794 @@
+[
+  {
+    "title": "Paneer Butter Masala",
+    "ingredients": [
+      "500g paneer, cubed",
+      "3 large tomatoes, pureed",
+      "200ml heavy cream",
+      "3 tbsp butter",
+      "2 onions, finely chopped",
+      "2 tsp garam masala",
+      "1 tsp kasuri methi",
+      "1 tsp red chili powder",
+      "Salt to taste"
+    ],
+    "instructions": "1. Heat butter in a pan over medium heat.\n2. Add onions and sauté until golden brown.\n3. Add ginger-garlic paste and cook for 2 minutes.\n4. Add tomato puree and cook for 10 minutes until oil separates.\n5. Add garam masala, chili powder, and kasuri methi.\n6. Add cream and mix well.\n7. Add paneer cubes and simmer for 5 minutes.\n8. Garnish with cream and serve hot with naan or rice.",
+    "tags": ["vegetarian", "north-indian", "main-course", "rich", "creamy"],
+    "difficulty": "medium",
+    "prep_time": 20,
+    "cook_time": 30,
+    "servings": 4,
+    "nutrition": {
+      "calories": 450,
+      "protein": 20,
+      "carbs": 15,
+      "fat": 35
+    },
+    "image_url": "https://images.unsplash.com/photo-1631452180519-c014fe946bc7"
+  },
+  {
+    "title": "Chicken Tikka Masala",
+    "ingredients": [
+      "800g boneless chicken, cubed",
+      "1 cup yogurt",
+      "3 tbsp tikka masala spice",
+      "2 cups tomato sauce",
+      "1 cup heavy cream",
+      "2 onions, diced",
+      "4 cloves garlic, minced",
+      "2 inch ginger, minced",
+      "3 tbsp oil",
+      "Salt to taste"
+    ],
+    "instructions": "1. Marinate chicken in yogurt and tikka masala spice for 2 hours.\n2. Grill or pan-fry chicken until cooked through.\n3. Heat oil in a pan, sauté onions until soft.\n4. Add garlic and ginger, cook for 2 minutes.\n5. Add tomato sauce and simmer for 10 minutes.\n6. Add cream and cooked chicken.\n7. Simmer for 15 minutes.\n8. Garnish with cilantro and serve with basmati rice.",
+    "tags": ["non-vegetarian", "indian", "main-course", "spicy"],
+    "difficulty": "medium",
+    "prep_time": 120,
+    "cook_time": 45,
+    "servings": 6,
+    "nutrition": {
+      "calories": 380,
+      "protein": 35,
+      "carbs": 18,
+      "fat": 20
+    },
+    "image_url": "https://images.unsplash.com/photo-1565557623262-b51c2513a641"
+  },
+  {
+    "title": "Vegetable Biryani",
+    "ingredients": [
+      "2 cups basmati rice",
+      "2 cups mixed vegetables",
+      "1 cup fried onions",
+      "1/2 cup yogurt",
+      "1/4 cup ghee",
+      "Whole spices (bay leaf, cardamom, cinnamon)",
+      "1 tsp biryani masala",
+      "Saffron soaked in milk",
+      "Fresh mint leaves",
+      "Salt to taste"
+    ],
+    "instructions": "1. Soak basmati rice for 30 minutes.\n2. Partially cook rice with whole spices.\n3. Sauté vegetables with biryani masala.\n4. Layer rice and vegetables alternately.\n5. Top with fried onions, mint, and saffron milk.\n6. Cover and cook on high heat for 3 minutes.\n7. Place on tawa and cook on low heat for 45 minutes.\n8. Gently mix and serve hot with raita.",
+    "tags": ["vegetarian", "indian", "main-course", "one-pot"],
+    "difficulty": "hard",
+    "prep_time": 45,
+    "cook_time": 60,
+    "servings": 6,
+    "nutrition": {
+      "calories": 320,
+      "protein": 8,
+      "carbs": 55,
+      "fat": 10
+    },
+    "image_url": "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8"
+  },
+  {
+    "title": "Caesar Salad",
+    "ingredients": [
+      "2 heads romaine lettuce",
+      "1/2 cup caesar dressing",
+      "1/4 cup parmesan cheese, grated",
+      "2 cups croutons",
+      "4 anchovy fillets",
+      "2 cloves garlic",
+      "1 lemon, juiced",
+      "1/4 cup olive oil",
+      "Black pepper to taste"
+    ],
+    "instructions": "1. Wash and chop romaine lettuce.\n2. Make dressing by whisking garlic, anchovies, lemon juice.\n3. Slowly add olive oil while whisking.\n4. Toss lettuce with dressing.\n5. Add parmesan cheese and croutons.\n6. Season with black pepper.\n7. Serve immediately.",
+    "tags": ["salad", "western", "starter", "light"],
+    "difficulty": "easy",
+    "prep_time": 15,
+    "cook_time": 5,
+    "servings": 4,
+    "nutrition": {
+      "calories": 220,
+      "protein": 8,
+      "carbs": 15,
+      "fat": 16
+    },
+    "image_url": "https://images.unsplash.com/photo-1550304943-4f24f54ddde9"
+  },
+  {
+    "title": "Spaghetti Carbonara",
+    "ingredients": [
+      "400g spaghetti",
+      "200g pancetta or bacon",
+      "4 egg yolks",
+      "1 cup parmesan cheese, grated",
+      "3 cloves garlic",
+      "Black pepper",
+      "Salt to taste",
+      "2 tbsp olive oil"
+    ],
+    "instructions": "1. Cook spaghetti according to package instructions.\n2. Fry pancetta until crispy.\n3. Beat egg yolks with parmesan cheese.\n4. Reserve 1 cup pasta water.\n5. Drain pasta and return to pot.\n6. Add pancetta and toss.\n7. Remove from heat, add egg mixture.\n8. Add pasta water to achieve creamy consistency.\n9. Season with black pepper and serve.",
+    "tags": ["italian", "pasta", "main-course", "comfort-food"],
+    "difficulty": "medium",
+    "prep_time": 10,
+    "cook_time": 20,
+    "servings": 4,
+    "nutrition": {
+      "calories": 480,
+      "protein": 22,
+      "carbs": 45,
+      "fat": 24
+    },
+    "image_url": "https://images.unsplash.com/photo-1612874742237-6526221588e3"
+  },
+  {
+    "title": "Tom Yum Soup",
+    "ingredients": [
+      "500g prawns, cleaned",
+      "4 cups chicken stock",
+      "3 stalks lemongrass",
+      "4 kaffir lime leaves",
+      "3 thai chilies",
+      "200g mushrooms",
+      "2 tomatoes, quartered",
+      "3 tbsp fish sauce",
+      "2 tbsp lime juice",
+      "Fresh cilantro"
+    ],
+    "instructions": "1. Bring chicken stock to boil.\n2. Add lemongrass, lime leaves, and chilies.\n3. Simmer for 5 minutes.\n4. Add mushrooms and tomatoes.\n5. Add prawns and cook until pink.\n6. Season with fish sauce and lime juice.\n7. Remove from heat.\n8. Garnish with cilantro and serve hot.",
+    "tags": ["thai", "soup", "seafood", "spicy", "starter"],
+    "difficulty": "easy",
+    "prep_time": 15,
+    "cook_time": 15,
+    "servings": 4,
+    "nutrition": {
+      "calories": 180,
+      "protein": 24,
+      "carbs": 8,
+      "fat": 5
+    },
+    "image_url": "https://images.unsplash.com/photo-1548943487-a2e4e43b4853"
+  },
+  {
+    "title": "Greek Moussaka",
+    "ingredients": [
+      "500g ground lamb",
+      "2 large eggplants, sliced",
+      "2 potatoes, sliced",
+      "1 onion, diced",
+      "2 cups tomato sauce",
+      "2 cups bechamel sauce",
+      "1/2 cup red wine",
+      "1 tsp cinnamon",
+      "1/2 cup parmesan cheese",
+      "Olive oil"
+    ],
+    "instructions": "1. Grill eggplant and potato slices.\n2. Brown ground lamb with onion.\n3. Add tomato sauce, wine, and cinnamon.\n4. Simmer for 20 minutes.\n5. Layer potatoes, eggplant, and meat sauce.\n6. Top with bechamel sauce.\n7. Sprinkle with parmesan.\n8. Bake at 180°C for 45 minutes until golden.",
+    "tags": ["greek", "main-course", "baked", "comfort-food"],
+    "difficulty": "hard",
+    "prep_time": 45,
+    "cook_time": 75,
+    "servings": 8,
+    "nutrition": {
+      "calories": 420,
+      "protein": 25,
+      "carbs": 28,
+      "fat": 24
+    },
+    "image_url": "https://images.unsplash.com/photo-1541628951107-a9af5346a3e4"
+  },
+  {
+    "title": "Japanese Ramen",
+    "ingredients": [
+      "4 portions fresh ramen noodles",
+      "1L chicken and pork broth",
+      "4 soft-boiled eggs",
+      "200g chashu pork",
+      "4 sheets nori",
+      "Green onions, sliced",
+      "Bamboo shoots",
+      "2 tbsp miso paste",
+      "1 tbsp soy sauce",
+      "Sesame oil"
+    ],
+    "instructions": "1. Heat broth and season with miso and soy sauce.\n2. Cook ramen noodles according to package.\n3. Slice chashu pork thinly.\n4. Divide noodles among bowls.\n5. Pour hot broth over noodles.\n6. Top with pork, egg halves, nori.\n7. Add bamboo shoots and green onions.\n8. Drizzle with sesame oil and serve immediately.",
+    "tags": ["japanese", "soup", "noodles", "main-course"],
+    "difficulty": "medium",
+    "prep_time": 30,
+    "cook_time": 20,
+    "servings": 4,
+    "nutrition": {
+      "calories": 520,
+      "protein": 28,
+      "carbs": 48,
+      "fat": 24
+    },
+    "image_url": "https://images.unsplash.com/photo-1569718212165-3a8278d5f624"
+  },
+  {
+    "title": "Mexican Tacos Al Pastor",
+    "ingredients": [
+      "500g pork shoulder, thinly sliced",
+      "1 pineapple, chunks",
+      "12 corn tortillas",
+      "3 dried chilies",
+      "1/4 cup orange juice",
+      "2 tbsp vinegar",
+      "Onion, diced",
+      "Cilantro",
+      "Lime wedges"
+    ],
+    "instructions": "1. Make marinade with chilies, orange juice, vinegar.\n2. Marinate pork for 4 hours.\n3. Grill pork with pineapple chunks.\n4. Chop meat into small pieces.\n5. Warm tortillas on griddle.\n6. Fill tortillas with meat and pineapple.\n7. Top with onion and cilantro.\n8. Serve with lime wedges.",
+    "tags": ["mexican", "street-food", "main-course", "spicy"],
+    "difficulty": "medium",
+    "prep_time": 240,
+    "cook_time": 30,
+    "servings": 6,
+    "nutrition": {
+      "calories": 340,
+      "protein": 22,
+      "carbs": 32,
+      "fat": 14
+    },
+    "image_url": "https://images.unsplash.com/photo-1565299585323-38d6b0865b47"
+  },
+  {
+    "title": "French Onion Soup",
+    "ingredients": [
+      "6 large onions, thinly sliced",
+      "4 cups beef broth",
+      "1/2 cup dry white wine",
+      "4 tbsp butter",
+      "French bread slices",
+      "2 cups gruyere cheese, grated",
+      "2 tsp sugar",
+      "Fresh thyme",
+      "Salt and pepper"
+    ],
+    "instructions": "1. Caramelize onions with butter and sugar for 40 minutes.\n2. Add wine and cook until reduced.\n3. Add beef broth and thyme.\n4. Simmer for 20 minutes.\n5. Season with salt and pepper.\n6. Ladle into oven-safe bowls.\n7. Top with bread and cheese.\n8. Broil until cheese is golden and bubbly.",
+    "tags": ["french", "soup", "starter", "comfort-food"],
+    "difficulty": "medium",
+    "prep_time": 15,
+    "cook_time": 75,
+    "servings": 4,
+    "nutrition": {
+      "calories": 380,
+      "protein": 18,
+      "carbs": 35,
+      "fat": 20
+    },
+    "image_url": "https://images.unsplash.com/photo-1547592166-23ac45744acd"
+  },
+  {
+    "title": "Pad Thai",
+    "ingredients": [
+      "200g rice noodles",
+      "200g prawns",
+      "2 eggs",
+      "1 cup bean sprouts",
+      "3 tbsp tamarind paste",
+      "2 tbsp fish sauce",
+      "2 tbsp palm sugar",
+      "Peanuts, crushed",
+      "Green onions",
+      "Lime wedges"
+    ],
+    "instructions": "1. Soak rice noodles in warm water for 30 minutes.\n2. Make sauce with tamarind, fish sauce, and sugar.\n3. Stir-fry prawns until cooked.\n4. Push aside and scramble eggs.\n5. Add drained noodles and sauce.\n6. Toss until noodles are tender.\n7. Add bean sprouts and green onions.\n8. Garnish with peanuts and serve with lime.",
+    "tags": ["thai", "noodles", "street-food", "main-course"],
+    "difficulty": "medium",
+    "prep_time": 35,
+    "cook_time": 15,
+    "servings": 4,
+    "nutrition": {
+      "calories": 380,
+      "protein": 18,
+      "carbs": 52,
+      "fat": 12
+    },
+    "image_url": "https://images.unsplash.com/photo-1559314809-0d155014e29e"
+  },
+  {
+    "title": "Moroccan Tagine",
+    "ingredients": [
+      "800g lamb shoulder, cubed",
+      "2 onions, sliced",
+      "Dried apricots",
+      "Almonds",
+      "2 tsp ras el hanout",
+      "1 tsp cinnamon",
+      "2 cups lamb stock",
+      "Fresh coriander",
+      "Preserved lemons",
+      "Honey"
+    ],
+    "instructions": "1. Brown lamb pieces in tagine or heavy pot.\n2. Remove meat and sauté onions.\n3. Add spices and cook for 1 minute.\n4. Return meat with stock.\n5. Add apricots and preserved lemons.\n6. Cover and simmer for 90 minutes.\n7. Add almonds and honey.\n8. Garnish with coriander and serve with couscous.",
+    "tags": ["moroccan", "stew", "main-course", "slow-cooked"],
+    "difficulty": "medium",
+    "prep_time": 25,
+    "cook_time": 120,
+    "servings": 6,
+    "nutrition": {
+      "calories": 420,
+      "protein": 32,
+      "carbs": 24,
+      "fat": 22
+    },
+    "image_url": "https://images.unsplash.com/photo-1511690743698-d9d85f2fbf38"
+  },
+  {
+    "title": "Korean Bibimbap",
+    "ingredients": [
+      "2 cups cooked rice",
+      "200g beef, marinated",
+      "Assorted vegetables (spinach, mushrooms, carrots)",
+      "4 fried eggs",
+      "4 tbsp gochujang",
+      "2 tbsp sesame oil",
+      "2 tbsp soy sauce",
+      "Sesame seeds",
+      "Kimchi"
+    ],
+    "instructions": "1. Cook rice and keep warm.\n2. Marinate beef in soy sauce and sesame oil.\n3. Blanch and season vegetables separately.\n4. Stir-fry beef until cooked.\n5. Place rice in bowls.\n6. Arrange vegetables and beef on top.\n7. Top with fried egg.\n8. Serve with gochujang and kimchi on side.",
+    "tags": ["korean", "rice-bowl", "main-course", "healthy"],
+    "difficulty": "medium",
+    "prep_time": 40,
+    "cook_time": 20,
+    "servings": 4,
+    "nutrition": {
+      "calories": 480,
+      "protein": 24,
+      "carbs": 52,
+      "fat": 20
+    },
+    "image_url": "https://images.unsplash.com/photo-1553163147-622ab57be1c7"
+  },
+  {
+    "title": "Shakshuka",
+    "ingredients": [
+      "6 eggs",
+      "4 tomatoes, diced",
+      "1 red bell pepper",
+      "1 onion, diced",
+      "4 cloves garlic",
+      "2 tsp paprika",
+      "1 tsp cumin",
+      "Fresh parsley",
+      "Feta cheese",
+      "Olive oil"
+    ],
+    "instructions": "1. Sauté onion and pepper in olive oil.\n2. Add garlic and spices, cook 1 minute.\n3. Add tomatoes and simmer for 15 minutes.\n4. Make wells and crack eggs into sauce.\n5. Cover and cook until eggs are set.\n6. Sprinkle with feta and parsley.\n7. Serve hot with pita bread.",
+    "tags": ["middle-eastern", "breakfast", "vegetarian", "one-pan"],
+    "difficulty": "easy",
+    "prep_time": 10,
+    "cook_time": 25,
+    "servings": 4,
+    "nutrition": {
+      "calories": 280,
+      "protein": 14,
+      "carbs": 18,
+      "fat": 18
+    },
+    "image_url": "https://images.unsplash.com/photo-1590438984355-5b11c3d57d60"
+  },
+  {
+    "title": "Vietnamese Pho",
+    "ingredients": [
+      "200g rice noodles",
+      "1L beef broth",
+      "200g beef sirloin, thinly sliced",
+      "Star anise",
+      "Cinnamon stick",
+      "Bean sprouts",
+      "Thai basil",
+      "Lime wedges",
+      "Hoisin sauce",
+      "Sriracha"
+    ],
+    "instructions": "1. Simmer broth with star anise and cinnamon.\n2. Cook rice noodles according to package.\n3. Divide noodles among bowls.\n4. Arrange raw beef slices on noodles.\n5. Pour boiling broth over beef.\n6. Beef will cook in hot broth.\n7. Serve with herbs, bean sprouts, lime.\n8. Add sauces to taste.",
+    "tags": ["vietnamese", "soup", "noodles", "main-course"],
+    "difficulty": "easy",
+    "prep_time": 20,
+    "cook_time": 30,
+    "servings": 4,
+    "nutrition": {
+      "calories": 320,
+      "protein": 22,
+      "carbs": 42,
+      "fat": 8
+    },
+    "image_url": "https://images.unsplash.com/photo-1555126634-323283e090fa"
+  },
+  {
+    "title": "Spanish Paella",
+    "ingredients": [
+      "2 cups bomba rice",
+      "500g mixed seafood",
+      "200g chicken thighs",
+      "4 cups seafood stock",
+      "Saffron threads",
+      "1 red bell pepper",
+      "Green beans",
+      "Tomatoes",
+      "Paprika",
+      "Lemon wedges"
+    ],
+    "instructions": "1. Heat paella pan with olive oil.\n2. Brown chicken pieces.\n3. Add vegetables and sauté.\n4. Add rice and toast for 2 minutes.\n5. Add hot stock with saffron.\n6. Arrange seafood on top.\n7. Simmer without stirring for 20 minutes.\n8. Rest for 5 minutes and serve with lemon.",
+    "tags": ["spanish", "rice", "seafood", "main-course"],
+    "difficulty": "hard",
+    "prep_time": 30,
+    "cook_time": 45,
+    "servings": 6,
+    "nutrition": {
+      "calories": 420,
+      "protein": 28,
+      "carbs": 48,
+      "fat": 14
+    },
+    "image_url": "https://images.unsplash.com/photo-1534080564583-6be75777b70a"
+  },
+  {
+    "title": "Lebanese Falafel",
+    "ingredients": [
+      "2 cups dried chickpeas",
+      "1 onion, chopped",
+      "1 cup fresh parsley",
+      "1 cup fresh cilantro",
+      "4 cloves garlic",
+      "2 tsp cumin",
+      "1 tsp coriander",
+      "1 tsp baking powder",
+      "Oil for deep frying"
+    ],
+    "instructions": "1. Soak chickpeas overnight.\n2. Drain and pat dry chickpeas.\n3. Blend with herbs, onion, and garlic.\n4. Add spices and baking powder.\n5. Form into balls or patties.\n6. Deep fry at 180°C until golden.\n7. Drain on paper towels.\n8. Serve in pita with tahini sauce.",
+    "tags": ["lebanese", "vegetarian", "street-food", "appetizer"],
+    "difficulty": "medium",
+    "prep_time": 720,
+    "cook_time": 20,
+    "servings": 6,
+    "nutrition": {
+      "calories": 260,
+      "protein": 12,
+      "carbs": 32,
+      "fat": 10
+    },
+    "image_url": "https://images.unsplash.com/photo-1593001874117-c75c7b7002fe"
+  },
+  {
+    "title": "Classic Margherita Pizza",
+    "ingredients": [
+      "Pizza dough for 2 pizzas",
+      "1 cup tomato sauce",
+      "400g fresh mozzarella",
+      "Fresh basil leaves",
+      "Extra virgin olive oil",
+      "2 cloves garlic",
+      "Sea salt",
+      "Black pepper"
+    ],
+    "instructions": "1. Stretch pizza dough to 12-inch circles.\n2. Spread tomato sauce evenly.\n3. Tear mozzarella and distribute.\n4. Drizzle with olive oil.\n5. Season with salt and pepper.\n6. Bake at 250°C for 10-12 minutes.\n7. Add fresh basil after baking.\n8. Drizzle more olive oil and serve hot.",
+    "tags": ["italian", "pizza", "vegetarian", "main-course"],
+    "difficulty": "easy",
+    "prep_time": 90,
+    "cook_time": 15,
+    "servings": 4,
+    "nutrition": {
+      "calories": 380,
+      "protein": 16,
+      "carbs": 45,
+      "fat": 16
+    },
+    "image_url": "https://images.unsplash.com/photo-1574071318508-1cdbab80d002"
+  },
+  {
+    "title": "Chinese Kung Pao Chicken",
+    "ingredients": [
+      "500g chicken breast, cubed",
+      "1/2 cup peanuts",
+      "Dried red chilies",
+      "3 green onions",
+      "2 tbsp soy sauce",
+      "1 tbsp rice wine",
+      "2 tsp cornstarch",
+      "1 tsp Sichuan peppercorns",
+      "Ginger and garlic"
+    ],
+    "instructions": "1. Marinate chicken with soy sauce and cornstarch.\n2. Toast peanuts and set aside.\n3. Stir-fry chicken until golden.\n4. Remove chicken, fry chilies and peppercorns.\n5. Add ginger, garlic, and green onions.\n6. Return chicken to wok.\n7. Add sauce and toss quickly.\n8. Add peanuts and serve with rice.",
+    "tags": ["chinese", "stir-fry", "spicy", "main-course"],
+    "difficulty": "medium",
+    "prep_time": 20,
+    "cook_time": 15,
+    "servings": 4,
+    "nutrition": {
+      "calories": 340,
+      "protein": 32,
+      "carbs": 18,
+      "fat": 16
+    },
+    "image_url": "https://images.unsplash.com/photo-1525755662778-989d0524087e"
+  },
+  {
+    "title": "Turkish Baklava",
+    "ingredients": [
+      "500g phyllo dough",
+      "2 cups mixed nuts, chopped",
+      "1 cup butter, melted",
+      "1 tsp cinnamon",
+      "2 cups sugar",
+      "1 cup water",
+      "1/2 cup honey",
+      "1 tsp vanilla",
+      "Lemon juice"
+    ],
+    "instructions": "1. Layer half of phyllo sheets, brushing each with butter.\n2. Spread nut mixture evenly.\n3. Layer remaining phyllo on top.\n4. Cut into diamond shapes.\n5. Bake at 160°C for 50 minutes until golden.\n6. Make syrup with sugar, water, honey.\n7. Pour hot syrup over hot baklava.\n8. Let cool completely before serving.",
+    "tags": ["turkish", "dessert", "sweet", "pastry"],
+    "difficulty": "hard",
+    "prep_time": 45,
+    "cook_time": 60,
+    "servings": 24,
+    "nutrition": {
+      "calories": 320,
+      "protein": 5,
+      "carbs": 38,
+      "fat": 18
+    },
+    "image_url": "https://images.unsplash.com/photo-1598110750624-207050c4f28c"
+  },
+  {
+    "title": "Brazilian Feijoada",
+    "ingredients": [
+      "500g black beans",
+      "400g assorted pork cuts",
+      "200g beef",
+      "200g smoked sausage",
+      "2 bay leaves",
+      "1 onion, diced",
+      "4 cloves garlic",
+      "Orange slices",
+      "Collard greens",
+      "Farofa"
+    ],
+    "instructions": "1. Soak beans overnight.\n2. Cook beans with bay leaves.\n3. Brown all meats separately.\n4. Add meats to beans.\n5. Sauté onion and garlic, add to pot.\n6. Simmer for 2 hours until tender.\n7. Serve with rice, collard greens, farofa.\n8. Garnish with orange slices.",
+    "tags": ["brazilian", "stew", "beans", "main-course"],
+    "difficulty": "medium",
+    "prep_time": 720,
+    "cook_time": 180,
+    "servings": 8,
+    "nutrition": {
+      "calories": 520,
+      "protein": 35,
+      "carbs": 42,
+      "fat": 24
+    },
+    "image_url": "https://images.unsplash.com/photo-1609501676725-7186f017a4b7"
+  },
+  {
+    "title": "German Schnitzel",
+    "ingredients": [
+      "4 pork cutlets",
+      "1 cup breadcrumbs",
+      "2 eggs, beaten",
+      "1 cup flour",
+      "Oil for frying",
+      "Lemon wedges",
+      "Fresh parsley",
+      "Salt and pepper"
+    ],
+    "instructions": "1. Pound cutlets to 1/4 inch thickness.\n2. Season with salt and pepper.\n3. Coat in flour, then egg, then breadcrumbs.\n4. Heat oil to 170°C.\n5. Fry schnitzels for 3 minutes per side.\n6. Drain on paper towels.\n7. Serve immediately with lemon wedges.\n8. Garnish with parsley.",
+    "tags": ["german", "fried", "main-course", "crispy"],
+    "difficulty": "easy",
+    "prep_time": 15,
+    "cook_time": 10,
+    "servings": 4,
+    "nutrition": {
+      "calories": 420,
+      "protein": 28,
+      "carbs": 32,
+      "fat": 20
+    },
+    "image_url": "https://images.unsplash.com/photo-1599921841143-819065a55cc6"
+  },
+  {
+    "title": "Ethiopian Doro Wat",
+    "ingredients": [
+      "1 whole chicken, cut up",
+      "6 hard-boiled eggs",
+      "3 onions, minced",
+      "1/4 cup berbere spice",
+      "1/4 cup clarified butter",
+      "2 tbsp ginger paste",
+      "2 tbsp garlic paste",
+      "1 cup chicken stock",
+      "Lime juice"
+    ],
+    "instructions": "1. Cook onions slowly until caramelized.\n2. Add berbere spice and cook 5 minutes.\n3. Add ginger and garlic paste.\n4. Add chicken pieces and brown.\n5. Add stock and simmer for 45 minutes.\n6. Peel eggs and score them.\n7. Add eggs to stew last 10 minutes.\n8. Serve with injera bread.",
+    "tags": ["ethiopian", "stew", "spicy", "main-course"],
+    "difficulty": "medium",
+    "prep_time": 30,
+    "cook_time": 75,
+    "servings": 6,
+    "nutrition": {
+      "calories": 380,
+      "protein": 32,
+      "carbs": 12,
+      "fat": 24
+    },
+    "image_url": "https://images.unsplash.com/photo-1604329760661-e71dc83f8f26"
+  },
+  {
+    "title": "Russian Borscht",
+    "ingredients": [
+      "4 medium beets, grated",
+      "500g beef, cubed",
+      "1 cabbage, shredded",
+      "2 carrots, diced",
+      "2 potatoes, cubed",
+      "1 onion, diced",
+      "2 tbsp tomato paste",
+      "Sour cream",
+      "Fresh dill",
+      "Vinegar"
+    ],
+    "instructions": "1. Brown beef in large pot.\n2. Add water and simmer for 1 hour.\n3. Sauté beets with vinegar.\n4. Add vegetables to beef broth.\n5. Add tomato paste and beets.\n6. Simmer for 30 minutes.\n7. Season with salt and pepper.\n8. Serve with sour cream and dill.",
+    "tags": ["russian", "soup", "vegetables", "comfort-food"],
+    "difficulty": "medium",
+    "prep_time": 30,
+    "cook_time": 120,
+    "servings": 8,
+    "nutrition": {
+      "calories": 280,
+      "protein": 18,
+      "carbs": 32,
+      "fat": 10
+    },
+    "image_url": "https://images.unsplash.com/photo-1615835462384-7ddc89ac3c23"
+  },
+  {
+    "title": "Peruvian Ceviche",
+    "ingredients": [
+      "500g fresh white fish, cubed",
+      "1 cup lime juice",
+      "1 red onion, sliced",
+      "2 aji amarillo peppers",
+      "Sweet potato, boiled",
+      "Corn kernels",
+      "Fresh cilantro",
+      "Salt to taste"
+    ],
+    "instructions": "1. Cut fish into bite-sized pieces.\n2. Marinate fish in lime juice for 15 minutes.\n3. Add sliced onions and peppers.\n4. Season with salt.\n5. Mix gently to combine.\n6. Serve immediately in bowls.\n7. Garnish with cilantro.\n8. Serve with sweet potato and corn.",
+    "tags": ["peruvian", "seafood", "raw", "appetizer", "light"],
+    "difficulty": "easy",
+    "prep_time": 25,
+    "cook_time": 0,
+    "servings": 4,
+    "nutrition": {
+      "calories": 180,
+      "protein": 24,
+      "carbs": 16,
+      "fat": 3
+    },
+    "image_url": "https://images.unsplash.com/photo-1535399831218-d5bd36d1a6b3"
+  },
+  {
+    "title": "Argentinian Empanadas",
+    "ingredients": [
+      "3 cups flour",
+      "1/2 cup butter",
+      "500g ground beef",
+      "2 onions, diced",
+      "2 hard-boiled eggs",
+      "Green olives",
+      "Cumin",
+      "Paprika",
+      "1 egg for wash"
+    ],
+    "instructions": "1. Make dough with flour, butter, and water.\n2. Rest dough for 30 minutes.\n3. Cook beef with onions and spices.\n4. Add chopped eggs and olives.\n5. Roll dough and cut circles.\n6. Fill with meat mixture.\n7. Seal edges and brush with egg.\n8. Bake at 200°C for 20 minutes until golden.",
+    "tags": ["argentinian", "pastry", "savory", "appetizer"],
+    "difficulty": "medium",
+    "prep_time": 60,
+    "cook_time": 40,
+    "servings": 12,
+    "nutrition": {
+      "calories": 280,
+      "protein": 12,
+      "carbs": 28,
+      "fat": 14
+    },
+    "image_url": "https://images.unsplash.com/photo-1610889556528-9a770e32642f"
+  },
+  {
+    "title": "Swedish Meatballs",
+    "ingredients": [
+      "500g ground beef and pork mix",
+      "1/2 cup breadcrumbs",
+      "1 egg",
+      "1 onion, minced",
+      "2 cups beef broth",
+      "1 cup heavy cream",
+      "2 tbsp butter",
+      "Lingonberry sauce",
+      "Fresh parsley"
+    ],
+    "instructions": "1. Mix meat, breadcrumbs, egg, and onion.\n2. Form into small meatballs.\n3. Brown meatballs in butter.\n4. Remove meatballs from pan.\n5. Make gravy with broth and cream.\n6. Return meatballs to gravy.\n7. Simmer for 10 minutes.\n8. Serve with lingonberry sauce and potatoes.",
+    "tags": ["swedish", "meatballs", "comfort-food", "main-course"],
+    "difficulty": "easy",
+    "prep_time": 20,
+    "cook_time": 30,
+    "servings": 6,
+    "nutrition": {
+      "calories": 380,
+      "protein": 24,
+      "carbs": 18,
+      "fat": 24
+    },
+    "image_url": "https://images.unsplash.com/photo-1529042410759-befb1204b468"
+  },
+  {
+    "title": "Australian Meat Pie",
+    "ingredients": [
+      "Puff pastry sheets",
+      "500g ground beef",
+      "1 onion, diced",
+      "2 cups beef stock",
+      "2 tbsp tomato paste",
+      "2 tbsp flour",
+      "Worcestershire sauce",
+      "1 egg for wash",
+      "Tomato sauce for serving"
+    ],
+    "instructions": "1. Cook beef and onion until browned.\n2. Add flour and cook 2 minutes.\n3. Add stock, tomato paste, Worcestershire.\n4. Simmer until thick, then cool.\n5. Line pie tins with pastry.\n6. Fill with meat mixture.\n7. Top with pastry and seal edges.\n8. Brush with egg and bake at 200°C for 25 minutes.",
+    "tags": ["australian", "pie", "savory", "comfort-food"],
+    "difficulty": "medium",
+    "prep_time": 45,
+    "cook_time": 40,
+    "servings": 6,
+    "nutrition": {
+      "calories": 420,
+      "protein": 18,
+      "carbs": 38,
+      "fat": 22
+    },
+    "image_url": "https://images.unsplash.com/photo-1565958011703-44f9829ba187"
+  },
+  {
+    "title": "Caribbean Jerk Chicken",
+    "ingredients": [
+      "1 whole chicken, cut up",
+      "3 scotch bonnet peppers",
+      "2 tbsp allspice",
+      "6 green onions",
+      "4 cloves garlic",
+      "2 tbsp brown sugar",
+      "2 tbsp soy sauce",
+      "1 tbsp thyme",
+      "Juice of 2 limes",
+      "Ginger"
+    ],
+    "instructions": "1. Blend all marinade ingredients.\n2. Score chicken and marinate overnight.\n3. Preheat grill to medium-high.\n4. Grill chicken, turning frequently.\n5. Baste with reserved marinade.\n6. Cook for 45 minutes until charred.\n7. Internal temperature should reach 75°C.\n8. Serve with rice and peas.",
+    "tags": ["caribbean", "grilled", "spicy", "main-course"],
+    "difficulty": "medium",
+    "prep_time": 720,
+    "cook_time": 45,
+    "servings": 6,
+    "nutrition": {
+      "calories": 320,
+      "protein": 35,
+      "carbs": 8,
+      "fat": 16
+    },
+    "image_url": "https://images.unsplash.com/photo-1532550907401-a500c9a57435"
+  }
+]

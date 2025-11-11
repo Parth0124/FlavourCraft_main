@@ -303,39 +303,71 @@ async def get_generated_recipe(
         )
 
 
-@router.put("/generated/{recipe_id}/favorite")
-async def toggle_favorite_recipe(
+@router.get("/generated/{recipe_id}", response_model=GeneratedRecipeResponse)
+async def get_generated_recipe(
     recipe_id: str,
-    current_user: UserResponse = Depends(get_current_user),
     db: AsyncIOMotorDatabase = Depends(get_database)
 ):
     """
-    Toggle favorite status of a generated recipe
+    Get a specific generated recipe by ID (public access)
     
     - **recipe_id**: Generated recipe ID
     
-    Returns success message
+    No authentication required - anyone can view community recipes
     """
     try:
+        from bson import ObjectId
+        from models.generated_recipe import GeneratedRecipe, ImageUrls
+        
         recipe_service = RecipeGenerationService(db)
         
-        success = await recipe_service.toggle_favorite(recipe_id, current_user.id)
+        doc = await recipe_service.generated_recipes_collection.find_one({
+            "_id": ObjectId(recipe_id)
+        })
         
-        if not success:
+        if not doc:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Recipe not found"
             )
         
-        return {"message": "Favorite status toggled successfully"}
+        # Get username from users collection
+        user = await recipe_service.db.users.find_one({"_id": doc["user_id"]})
+        username = user.get("username", "Anonymous") if user else "Anonymous"
+        
+        # Parse image URLs if present
+        image_urls = None
+        if doc.get("image_urls"):
+            image_urls = ImageUrls(**doc["image_urls"])
+        
+        # ✅ FIX: Handle both string and list formats for dietary_preferences
+        dietary_prefs = doc.get("dietary_preferences", [])
+        if isinstance(dietary_prefs, str):
+            # If it's a string, split by comma and strip whitespace
+            dietary_prefs = [pref.strip() for pref in dietary_prefs.split(",")] if dietary_prefs else []
+        elif not isinstance(dietary_prefs, list):
+            # If it's neither string nor list, default to empty list
+            dietary_prefs = []
+        
+        return GeneratedRecipeResponse(
+            id=str(doc["_id"]),
+            recipe=GeneratedRecipe(**doc["generated_recipe"]),
+            ingredients_used=doc["ingredients"],
+            created_at=doc["timestamp"],
+            is_favorite=doc.get("is_favorite", False),
+            image_urls=image_urls,
+            username=username,
+            cuisine_type=doc.get("cuisine_type", ""),
+            dietary_preferences=dietary_prefs  # ✅ Now properly converted to list
+        )
         
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"Error toggling favorite: {str(e)}")
+        logger.error(f"Error fetching generated recipe: {str(e)}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="An error occurred while updating favorite status"
+            detail="An error occurred while fetching the recipe"
         )
 
 
@@ -378,6 +410,15 @@ async def get_favorite_recipes(
             if doc.get("image_urls"):
                 image_urls = ImageUrls(**doc["image_urls"])
             
+            # ✅ FIX: Handle both string and list formats for dietary_preferences
+            dietary_prefs = doc.get("dietary_preferences", [])
+            if isinstance(dietary_prefs, str):
+                # If it's a string, split by comma and strip whitespace
+                dietary_prefs = [pref.strip() for pref in dietary_prefs.split(",")] if dietary_prefs else []
+            elif not isinstance(dietary_prefs, list):
+                # If it's neither string nor list, default to empty list
+                dietary_prefs = []
+            
             recipes.append(GeneratedRecipeResponse(
                 id=str(doc["_id"]),
                 recipe=GeneratedRecipe(**doc["generated_recipe"]),
@@ -387,7 +428,7 @@ async def get_favorite_recipes(
                 image_urls=image_urls,
                 username=current_user.username,
                 cuisine_type=doc.get("cuisine_type", ""),
-                dietary_preferences=", ".join(doc.get("dietary_preferences", []))
+                dietary_preferences=dietary_prefs  # ✅ Now properly converted to list
             ))
         
         return RecipeHistoryResponse(

@@ -25,7 +25,7 @@ const AuthForm = ({ mode }: AuthFormProps) => {
     try {
       if (mode === "login") {
         await login({ email, password });
-        navigate("/preferences");
+        navigate("/"); // Redirect to home page after login
       } else {
         // Signup mode
         if (!email || !password || !confirmPassword || !username) {
