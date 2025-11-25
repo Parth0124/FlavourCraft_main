@@ -1,0 +1,56 @@
+global:
+  scrape_interval: 15s  # Scrape targets every 15 seconds
+  evaluation_interval: 15s  # Evaluate rules every 15 seconds
+  external_labels:
+    monitor: 'flavourcraft-monitor'
+    environment: 'production'
+
+# Alerting configuration (optional - can be extended)
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: []
+
+# Rule files for alerting (optional)
+rule_files:
+  # - "alerts/*.yml"
+
+# Scrape configurations
+scrape_configs:
+  # FlavourCraft API metrics
+  - job_name: 'flavourcraft-api'
+    scrape_interval: 10s
+    metrics_path: '/mlops/metrics'
+    static_configs:
+      - targets: ['flavourcraft-api:8000']
+        labels:
+          application: 'flavourcraft'
+          service: 'api'
+          environment: 'production'
+
+  # Prometheus self-monitoring
+  - job_name: 'prometheus'
+    scrape_interval: 15s
+    static_configs:
+      - targets: ['localhost:9090']
+        labels:
+          application: 'prometheus'
+          service: 'monitoring'
+
+  # Node Exporter for system metrics
+  - job_name: 'node-exporter'
+    scrape_interval: 15s
+    static_configs:
+      - targets: ['node-exporter:9100']
+        labels:
+          application: 'node-exporter'
+          service: 'system-metrics'
+
+  # Grafana metrics (optional)
+  - job_name: 'grafana'
+    scrape_interval: 30s
+    static_configs:
+      - targets: ['grafana:3000']
+        labels:
+          application: 'grafana'
+          service: 'dashboards'

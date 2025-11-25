@@ -17,10 +17,40 @@ from PIL import Image
 import asyncio
 import torch
 import numpy as np
+import time
 
 from config import get_settings
 from utils.logger import get_logger
-from utils.validators import validate_ingredients
+
+# MLOps imports - with lazy loading to avoid circular imports
+_mlflow_manager = None
+_prometheus_metrics = None
+_model_monitor = None
+
+
+def _get_mlflow():
+    global _mlflow_manager
+    if _mlflow_manager is None:
+        from services.mlflow_service import mlflow_manager
+        _mlflow_manager = mlflow_manager
+    return _mlflow_manager
+
+
+def _get_prometheus():
+    global _prometheus_metrics
+    if _prometheus_metrics is None:
+        from services.prometheus_service import prometheus_metrics
+        _prometheus_metrics = prometheus_metrics
+    return _prometheus_metrics
+
+
+def _get_monitor():
+    global _model_monitor
+    if _model_monitor is None:
+        from services.model_monitoring_service import model_monitor
+        _model_monitor = model_monitor
+    return _model_monitor
+
 
 settings = get_settings()
 logger = get_logger(__name__)
@@ -46,14 +76,6 @@ class IngredientDetectionService:
     def _initialize_local_model(self):
         """
         Initialize CLIP model for zero-shot ingredient classification
-        
-        CLIP can classify images against text descriptions, making it perfect
-        for ingredient detection. We'll use a predefined list of common ingredients.
-        
-        Model: openai/clip-vit-base-patch32
-        Size: ~600MB
-        Accuracy: 60-75% for common ingredients
-        Speed: 1-2s on CPU, <0.5s on GPU
         """
         try:
             from transformers import CLIPProcessor, CLIPModel
@@ -130,26 +152,22 @@ class IngredientDetectionService:
     ) -> Tuple[List[str], float]:
         """
         Detect ingredients using CLIP zero-shot classification
-        
-        CLIP compares the image against text descriptions of ingredients
-        and returns similarity scores. We select ingredients with high confidence.
-        
-        Args:
-            image_bytes: Image content as bytes
-            
-        Returns:
-            Tuple of (ingredients list, confidence score)
         """
         if not self.local_model or not self.clip_processor:
             logger.info("Local CLIP model not available, skipping local detection")
             return [], 0.0
         
+        start_time = time.time()
+        ingredients = []
+        scores = []
+        avg_confidence = 0.0
+        
+        # STEP 1: DETECTION (Critical - must complete)
         try:
             # Open and prepare image
             image = Image.open(io.BytesIO(image_bytes)).convert('RGB')
             
             # Prepare inputs for CLIP
-            # We'll compare the image against all ingredient labels
             inputs = self.clip_processor(
                 text=self.ingredient_labels,
                 images=image,
@@ -163,7 +181,6 @@ class IngredientDetectionService:
             def run_clip():
                 with torch.no_grad():
                     outputs = self.local_model(**inputs)
-                    # Get similarity scores between image and each text label
                     logits_per_image = outputs.logits_per_image
                     probs = logits_per_image.softmax(dim=1)
                 return probs.cpu().numpy()[0]
@@ -171,11 +188,7 @@ class IngredientDetectionService:
             probabilities = await loop.run_in_executor(None, run_clip)
             
             # Get top predictions
-            # We'll use a threshold to only include confident predictions
             confidence_threshold = 0.15  # 15% confidence minimum
-            
-            ingredients = []
-            scores = []
             
             for idx, prob in enumerate(probabilities):
                 if prob > confidence_threshold:
@@ -191,17 +204,57 @@ class IngredientDetectionService:
             else:
                 avg_confidence = 0.0
             
+            processing_time = time.time() - start_time
+            
             if ingredients:
                 logger.info(f"🎯 CLIP detected {len(ingredients)} ingredients: {', '.join(ingredients[:5])}...")
                 logger.info(f"   Average confidence: {avg_confidence:.2%}")
             else:
                 logger.info("⚠️  CLIP did not detect any ingredients above confidence threshold")
-            
-            return ingredients, avg_confidence
-            
+                
         except Exception as e:
             logger.error(f"Error in CLIP ingredient detection: {str(e)}")
+            processing_time = time.time() - start_time
             return [], 0.0
+        
+        # STEP 2: MLOPS TRACKING (Non-critical - can fail safely)
+        if settings.PROMETHEUS_ENABLED:
+            try:
+                prometheus = _get_prometheus()
+                prometheus.track_ingredient_detection(
+                    model_name="clip_ingredient_detector",
+                    num_ingredients=len(ingredients),
+                    confidence_score=avg_confidence,
+                    processing_time=processing_time,
+                    success=len(ingredients) > 0
+                )
+                
+                monitor = _get_monitor()
+                monitor.record_prediction(
+                    model_name="clip_ingredient_detector",
+                    prediction=ingredients,
+                    confidence=avg_confidence,
+                    latency=processing_time,
+                    input_features={"num_ingredients": len(ingredients)}
+                )
+                
+                mlflow = _get_mlflow()
+                mlflow.log_ingredient_detection(
+                    ingredients=ingredients,
+                    confidence_scores=dict(zip(ingredients, scores)) if ingredients else {},
+                    detection_method="clip_local",
+                    processing_time=processing_time,
+                    image_metadata={"model": "clip-vit-base-patch32"}
+                )
+                
+                logger.debug(f"[MLOps] CLIP detection tracked: {len(ingredients)} ingredients")
+                
+            except Exception as e:
+                # MLOps tracking failed - just log it, don't affect results
+                logger.error(f"[MLOps] Tracking failed (non-critical): {str(e)}")
+        
+        # STEP 3: ALWAYS RETURN DETECTION RESULTS
+        return ingredients, avg_confidence
     
     async def detect_ingredients_openai(
         self, 
@@ -209,16 +262,16 @@ class IngredientDetectionService:
     ) -> Tuple[List[str], float]:
         """
         Detect ingredients using OpenAI Vision API
-        
-        Args:
-            image_bytes: Image content as bytes
-            
-        Returns:
-            Tuple of (ingredients list, confidence score)
         """
         if not self.openai_client:
             return [], 0.0
         
+        start_time = time.time()
+        ingredients = []
+        confidence = 0.0
+        content = ""
+        
+        # STEP 1: DETECTION (Critical - must complete)
         try:
             import base64
             
@@ -264,13 +317,61 @@ class IngredientDetectionService:
             # OpenAI typically has high confidence, use 0.85 as baseline
             confidence = 0.85
             
-            logger.info(f"OpenAI detected {len(ingredients)} ingredients")
+            processing_time = time.time() - start_time
             
-            return ingredients, confidence
+            logger.info(f"OpenAI detected {len(ingredients)} ingredients")
             
         except Exception as e:
             logger.error(f"Error in OpenAI ingredient detection: {str(e)}")
+            processing_time = time.time() - start_time
             return [], 0.0
+        
+        # STEP 2: MLOPS TRACKING (Non-critical - can fail safely)
+        if settings.PROMETHEUS_ENABLED:
+            try:
+                prometheus = _get_prometheus()
+                prometheus.track_ingredient_detection(
+                    model_name="openai_vision",
+                    num_ingredients=len(ingredients),
+                    confidence_score=confidence,
+                    processing_time=processing_time,
+                    success=len(ingredients) > 0
+                )
+                
+                prometheus.track_openai_api_call(
+                    operation="vision_ingredient_detection",
+                    status="success",
+                    latency=processing_time,
+                    tokens_used=len(content.split()) if content else 0,
+                    cost_estimate=0.001
+                )
+                
+                monitor = _get_monitor()
+                monitor.record_prediction(
+                    model_name="openai_vision",
+                    prediction=ingredients,
+                    confidence=confidence,
+                    latency=processing_time,
+                    input_features={"num_ingredients": len(ingredients)}
+                )
+                
+                mlflow = _get_mlflow()
+                mlflow.log_ingredient_detection(
+                    ingredients=ingredients,
+                    confidence_scores={ing: confidence for ing in ingredients},
+                    detection_method="openai_vision",
+                    processing_time=processing_time,
+                    image_metadata={"model": settings.OPENAI_MODEL}
+                )
+                
+                logger.debug(f"[MLOps] OpenAI detection tracked: {len(ingredients)} ingredients")
+                
+            except Exception as e:
+                # MLOps tracking failed - just log it, don't affect results
+                logger.error(f"[MLOps] Tracking failed (non-critical): {str(e)}")
+        
+        # STEP 3: ALWAYS RETURN DETECTION RESULTS
+        return ingredients, confidence
     
     def merge_detection_results(
         self,
@@ -279,14 +380,9 @@ class IngredientDetectionService:
     ) -> Dict[str, any]:
         """
         Merge results from local and OpenAI models
-        
-        Args:
-            local_results: Tuple of (ingredients, confidence) from local model
-            openai_results: Tuple of (ingredients, confidence) from OpenAI
-            
-        Returns:
-            Dictionary with merged results
         """
+        from utils.validators import validate_ingredients
+        
         local_ingredients, local_confidence = local_results
         openai_ingredients, openai_confidence = openai_results
         
@@ -296,7 +392,6 @@ class IngredientDetectionService:
         
         # Calculate weighted confidence
         if local_confidence > 0 and openai_confidence > 0:
-            # Both models provided results
             total_confidence = (local_confidence + openai_confidence) / 2
             source = "hybrid"
         elif openai_confidence > 0:
@@ -327,13 +422,9 @@ class IngredientDetectionService:
         2. If confidence is low (<40%), use OpenAI as backup
         3. If no OpenAI key, return local results regardless
         4. Merge results if both are used
-        
-        Args:
-            image_bytes: Image content as bytes
-            
-        Returns:
-            Dictionary with detection results
         """
+        pipeline_start = time.time()
+        
         logger.info("🚀 Starting ingredient detection with OPEN-SOURCE MODELS...")
         
         local_results = ([], 0.0)
@@ -387,6 +478,41 @@ class IngredientDetectionService:
         
         # Merge results
         merged_results = self.merge_detection_results(local_results, openai_results)
+        
+        pipeline_time = time.time() - pipeline_start
+        
+        # Track full pipeline (non-critical)
+        if settings.PROMETHEUS_ENABLED:
+            try:
+                prometheus = _get_prometheus()
+                prometheus.track_ingredient_detection(
+                    model_name="ingredient_detection_pipeline",
+                    num_ingredients=merged_results['total_unique'],
+                    confidence_score=merged_results['confidence'],
+                    processing_time=pipeline_time,
+                    success=merged_results['total_unique'] > 0
+                )
+                
+                # Check for drift
+                if settings.ENABLE_DRIFT_DETECTION:
+                    monitor = _get_monitor()
+                    drift_result = monitor.check_drift(
+                        model_name="ingredient_detection_pipeline",
+                        current_metrics={
+                            "confidence": merged_results['confidence'],
+                            "latency": pipeline_time
+                        }
+                    )
+                    if drift_result and drift_result.get('drift_detected'):
+                        logger.warning(f"⚠️  Model drift detected! Score: {drift_result.get('drift_score', 0):.3f}")
+                        merged_results['drift_detected'] = True
+                        merged_results['drift_score'] = drift_result.get('drift_score', 0)
+                
+                logger.info(f"[MLOps] Full detection pipeline tracked: {merged_results['total_unique']} ingredients, {pipeline_time:.2f}s")
+                
+            except Exception as e:
+                logger.error(f"[MLOps] Pipeline tracking failed (non-critical): {str(e)}")
+                # Don't affect results
         
         # Add helpful message if no ingredients detected
         if merged_results['total_unique'] == 0:

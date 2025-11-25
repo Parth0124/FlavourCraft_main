@@ -5,6 +5,7 @@ from typing import List, Optional, Dict
 from datetime import datetime
 from motor.motor_asyncio import AsyncIOMotorDatabase
 from bson import ObjectId
+import time
 
 from models.generated_recipe import (
     GeneratedRecipeRequest,
@@ -15,6 +16,11 @@ from models.generated_recipe import (
 from models.static_recipe import StaticRecipe, RecipeFilter
 from config import get_settings
 from utils.logger import get_logger
+
+# MLOps imports
+from services.mlflow_service import mlflow_manager
+from services.prometheus_service import prometheus_metrics
+from services.model_monitoring_service import model_monitor
 
 settings = get_settings()
 logger = get_logger(__name__)
@@ -30,6 +36,14 @@ class RecipeGenerationService:
         
         if settings.OPENAI_API_KEY:
             self._initialize_openai()
+        
+        # MLOps: Set baseline for monitoring
+        model_monitor.set_baseline("openai_recipe_generator", {
+            "confidence_mean": 0.85,
+            "confidence_std": 0.10,
+            "latency_mean": 3.0,
+            "latency_std": 1.0
+        })
     
     def _initialize_openai(self):
         """Initialize OpenAI client"""
@@ -53,6 +67,10 @@ class RecipeGenerationService:
         Returns:
             Generated recipe or None
         """
+        # MLOps: Start timing
+        start_time = time.time()
+        model_name = "openai_recipe_generator"
+        
         if not self.openai_client:
             return None
         
@@ -82,10 +100,77 @@ class RecipeGenerationService:
             recipe = self._parse_recipe_response(content, request)
             
             logger.info(f"Generated recipe using OpenAI: {recipe.title}")
+            
+            # MLOps: Track metrics
+            processing_time = time.time() - start_time
+            complexity = recipe.difficulty
+            
+            prometheus_metrics.track_recipe_generation(
+                model="openai",
+                status="success",
+                duration=processing_time,
+                complexity=complexity
+            )
+            
+            prometheus_metrics.track_openai_api_call(
+                operation="recipe_generation",
+                status="success",
+                latency=processing_time
+            )
+            
+            model_monitor.record_prediction(
+                model_name=model_name,
+                prediction=recipe.title,
+                confidence=0.85,  # OpenAI baseline
+                latency=processing_time,
+                input_features={
+                    "num_ingredients": len(request.ingredients),
+                    "has_dietary_prefs": bool(request.dietary_preferences),
+                    "has_cuisine_type": bool(request.cuisine_type)
+                }
+            )
+            
+            mlflow_manager.log_recipe_generation(
+                recipe_title=recipe.title,
+                ingredients_used=request.ingredients,
+                generation_model="openai_gpt",
+                generation_time=processing_time,
+                recipe_complexity=complexity
+            )
+            
+            # Check for drift
+            drift_result = model_monitor.detect_drift(model_name=model_name, drift_type="latency")
+            if drift_result.get("drift_detected"):
+                logger.warning(f"[MLOps] Drift detected in recipe generation: {drift_result['drift_score']:.4f}")
+            
+            logger.info(f"[MLOps] Recipe generation tracked: '{recipe.title}', {processing_time:.2f}s")
+            
             return recipe
             
         except Exception as e:
+            # MLOps: Track error
+            processing_time = time.time() - start_time
+            
+            prometheus_metrics.track_recipe_generation(
+                model="openai",
+                status="error",
+                duration=processing_time,
+                complexity="unknown"
+            )
+            
+            prometheus_metrics.track_openai_api_call(
+                operation="recipe_generation",
+                status="error",
+                latency=processing_time
+            )
+            
+            prometheus_metrics.track_model_error(
+                model_name=model_name,
+                error_type=type(e).__name__
+            )
+            
             logger.error(f"Error generating recipe with OpenAI: {str(e)}")
+            logger.error(f"[MLOps] Recipe generation error tracked: {e}")
             return None
     
     def _build_generation_prompt(self, request: GeneratedRecipeRequest) -> str:
@@ -255,6 +340,9 @@ SERVINGS: [number of servings]
         Returns:
             Generated recipe response
         """
+        # MLOps: Start timing full pipeline
+        pipeline_start_time = time.time()
+        
         # Try OpenAI first
         recipe = await self.generate_recipe_openai(request)
         source = "openai"
@@ -282,9 +370,28 @@ SERVINGS: [number of servings]
         }
         
         # Save to database
+        db_start = time.time()
         result = await self.generated_recipes_collection.insert_one(recipe_doc)
+        db_duration = time.time() - db_start
         
         logger.info(f"Recipe saved for user {user_id}: {recipe.title}")
+        
+        # MLOps: Track full pipeline
+        pipeline_duration = time.time() - pipeline_start_time
+        
+        prometheus_metrics.track_database_operation(
+            operation="insert",
+            collection="generated_recipes",
+            status="success",
+            duration=db_duration
+        )
+        
+        mlflow_manager.log_metrics({
+            "recipe_generation_pipeline_duration": pipeline_duration,
+            "recipe_saved_successfully": 1.0
+        })
+        
+        logger.info(f"[MLOps] Full recipe pipeline tracked: {pipeline_duration:.2f}s")
         
         # Parse image URLs for response
         from models.generated_recipe import ImageUrls

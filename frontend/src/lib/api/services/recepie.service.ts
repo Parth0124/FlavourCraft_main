@@ -47,7 +47,7 @@ export const recipeService = {
   },
 
   async toggleFavorite(recipeId: string) {
-    const response = await api.put(`/recipes/generated/${recipeId}/favorite`);
+    const response = await api.patch(`/recipes/generated/${recipeId}/favorite`);
     return response.data;
   },
 

@@ -22,6 +22,7 @@ upload = importlib.import_module("routes.upload")
 recipes = importlib.import_module("routes.recipes")
 users = importlib.import_module("routes.users")
 cuisine = importlib.import_module("routes.cuisine")
+mlops_monitoring = importlib.import_module("routes.mlops_monitoring")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -111,7 +112,7 @@ app.include_router(upload.router)
 app.include_router(recipes.router)
 app.include_router(users.router)
 app.include_router(cuisine.router)
-
+app.include_router(mlops_monitoring.router)
 
 @app.get("/", tags=["Root"])
 async def root():

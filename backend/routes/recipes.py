@@ -243,66 +243,6 @@ async def get_recipe_history(
             detail="An error occurred while fetching recipe history"
         )
 
-
-@router.get("/generated/{recipe_id}", response_model=GeneratedRecipeResponse)
-async def get_generated_recipe(
-    recipe_id: str,
-    db: AsyncIOMotorDatabase = Depends(get_database)
-):
-    """
-    Get a specific generated recipe by ID (public access)
-    
-    - **recipe_id**: Generated recipe ID
-    
-    No authentication required - anyone can view community recipes
-    """
-    try:
-        from bson import ObjectId
-        from models.generated_recipe import GeneratedRecipe, ImageUrls
-        
-        recipe_service = RecipeGenerationService(db)
-        
-        doc = await recipe_service.generated_recipes_collection.find_one({
-            "_id": ObjectId(recipe_id)
-        })
-        
-        if not doc:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Recipe not found"
-            )
-        
-        # Get username from users collection
-        user = await recipe_service.db.users.find_one({"_id": doc["user_id"]})
-        username = user.get("username", "Anonymous") if user else "Anonymous"
-        
-        # Parse image URLs if present
-        image_urls = None
-        if doc.get("image_urls"):
-            image_urls = ImageUrls(**doc["image_urls"])
-        
-        return GeneratedRecipeResponse(
-            id=str(doc["_id"]),
-            recipe=GeneratedRecipe(**doc["generated_recipe"]),
-            ingredients_used=doc["ingredients"],
-            created_at=doc["timestamp"],
-            is_favorite=doc.get("is_favorite", False),
-            image_urls=image_urls,
-            username=username,
-            cuisine_type=doc.get("cuisine_type", ""),
-            dietary_preferences=", ".join(doc.get("dietary_preferences", []))
-        )
-        
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"Error fetching generated recipe: {str(e)}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="An error occurred while fetching the recipe"
-        )
-
-
 @router.get("/generated/{recipe_id}", response_model=GeneratedRecipeResponse)
 async def get_generated_recipe(
     recipe_id: str,
@@ -370,6 +310,50 @@ async def get_generated_recipe(
             detail="An error occurred while fetching the recipe"
         )
 
+@router.patch("/generated/{recipe_id}/favorite", status_code=status.HTTP_200_OK)
+async def toggle_favorite_recipe(
+    recipe_id: str,
+    current_user: UserResponse = Depends(get_current_user),
+    db: AsyncIOMotorDatabase = Depends(get_database)
+):
+    """
+    Toggle favorite status for a generated recipe
+    
+    - **recipe_id**: Generated recipe ID
+    
+    Returns success status and new favorite state
+    """
+    try:
+        recipe_service = RecipeGenerationService(db)
+        
+        success = await recipe_service.toggle_favorite(recipe_id, current_user.id)
+        
+        if not success:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Recipe not found or you don't have permission to modify it"
+            )
+        
+        # Get updated recipe to return new favorite status
+        from bson import ObjectId
+        doc = await recipe_service.generated_recipes_collection.find_one({
+            "_id": ObjectId(recipe_id),
+            "user_id": current_user.id
+        })
+        
+        return {
+            "success": True,
+            "is_favorite": doc.get("is_favorite", False)
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error toggling favorite: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="An error occurred while updating favorite status"
+        )
 
 @router.get("/favorites", response_model=RecipeHistoryResponse)
 async def get_favorite_recipes(
