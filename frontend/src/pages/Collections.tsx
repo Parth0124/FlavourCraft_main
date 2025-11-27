@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
-import { ChefHat, Clock, Filter, RotateCcw, X, Calendar, Utensils, Leaf, Globe, ArrowLeft, ChevronRight } from "lucide-react";
+import { ChefHat, Clock, Filter, RotateCcw, Calendar, Utensils, Leaf, Globe, ArrowLeft, ChevronRight } from "lucide-react";
 import { recipeService } from "../lib/api/services/recepie.service";
-import type { GeneratedRecipeResponse } from "../types/api.types";
 
 // Import cuisine images
 import italianImg from "/src/assets/italian.webp";

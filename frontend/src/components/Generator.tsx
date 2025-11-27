@@ -17,13 +17,12 @@ import { toast } from "react-hot-toast";
 import type { ImageUrls, GeneratedRecipeResponse } from "@/types/api.types";
 
 interface RecipeGeneratorProps {
-  ingredientCount: number;
+  ingredientCount?: number;  // Optional, not used but kept for backward compatibility
   detectedIngredients: string[];
   imageUrls?: ImageUrls;
 }
 
 const RecipeGenerator: React.FC<RecipeGeneratorProps> = ({
-  ingredientCount,
   detectedIngredients = [],
   imageUrls
 }) => {

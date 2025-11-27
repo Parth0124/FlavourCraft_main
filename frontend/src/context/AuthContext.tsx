@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { apiClient } from '@/lib/api/client';
 import { authService } from '@/lib/api/services/auth.service';
@@ -40,7 +40,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const login = async (data: LoginRequest) => {
-    const tokens = await authService.login(data);
+    await authService.login(data);
     const userData = await authService.getCurrentUser();
     setUser(userData);
     navigate('/');

@@ -66,9 +66,19 @@ export interface GeneratedRecipeResponse {
   created_at: string;
   is_favorite: boolean;
   image_urls?: ImageUrls;
+  image_urls_list?: ImageUrls[];  // ✅ FIXED: Added for multi-image support
   cuisine_type?: string;  // ✅ FIXED: Added cuisine_type
   dietary_preferences?: string[];  // ✅ FIXED: Changed from string to string[]
   username?: string;  // Username of the creator
+  options?: string[];  // ✅ FIXED: Added for recipe options/variations
+}
+
+// Recipe History Response
+export interface RecipeHistoryResponse {
+  recipes: GeneratedRecipeResponse[];
+  total: number;
+  page: number;
+  page_size: number;
 }
 
 // Cuisine Types
@@ -117,6 +127,7 @@ export interface IngredientDetectionResult {
     total_unique: number;
   };
   requires_verification: boolean;
+  image_urls?: ImageUrls;  // ✅ FIXED: Added image_urls field
 }
 
 // Static Recipe Types

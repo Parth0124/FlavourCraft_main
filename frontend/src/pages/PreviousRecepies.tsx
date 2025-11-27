@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { ChefHat, Clock, Search, Filter, Heart, X, Users, ChevronLeft, ChevronRight, Globe, Leaf } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { recipeService } from "../lib/api/services/recepie.service";
-import type { GeneratedRecipeResponse } from "../types/api.types";
+import type { GeneratedRecipeResponse, ImageUrls } from "../types/api.types";
 
 type RecipeModalProps = {
   isOpen: boolean;
@@ -25,7 +25,7 @@ const RecipeModal = ({ isOpen, onClose, recipe }: RecipeModalProps) => {
   
   if (recipe.image_urls_list && recipe.image_urls_list.length > 0) {
     imageUrls = recipe.image_urls_list
-      .map(img => img.medium_url || img.url)
+      .map((img: ImageUrls) => img.medium_url || img.url)
       .filter(Boolean) as string[];
   } else if (recipe.image_urls) {
     imageUrls = [
@@ -157,8 +157,8 @@ const RecipeModal = ({ isOpen, onClose, recipe }: RecipeModalProps) => {
                 <h3 className="text-lg font-bold text-gray-800">Dietary Information</h3>
               </div>
               <div className="flex flex-wrap gap-2">
-                {(recipe.dietary_preferences || recipe.options?.dietary_preferences || []).map((pref, index) => (
-                  <span 
+                {(recipe.dietary_preferences || recipe.options?.dietary_preferences || []).map((pref: string, index: number) => (
+                  <span
                     key={index}
                     className="px-3 py-1 bg-white border border-green-200 text-green-700 rounded-full text-sm font-medium"
                   >
@@ -520,7 +520,7 @@ const BrowseRecipes = () => {
                     {/* Dietary Preferences Pills */}
                     {dietaryPrefs.length > 0 && (
                       <div className="flex flex-wrap gap-1">
-                        {dietaryPrefs.slice(0, 2).map((pref, idx) => (
+                        {dietaryPrefs.slice(0, 2).map((pref: string, idx: number) => (
                           <span
                             key={idx}
                             className="px-2 py-1 bg-green-50 text-green-600 text-xs rounded-lg flex items-center gap-1"

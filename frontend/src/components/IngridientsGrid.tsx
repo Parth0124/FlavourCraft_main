@@ -249,7 +249,7 @@ const IngredientGrid: React.FC<IngredientGridProps> = ({
               alt="Full size"
               className="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl"
               onClick={(e) => e.stopPropagation()}
-              onError={(e) => {
+              onError={() => {
                 console.error("❌ Lightbox image failed to load:", lightboxImage);
               }}
               onLoad={() => {

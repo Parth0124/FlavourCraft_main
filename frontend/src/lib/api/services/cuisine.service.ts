@@ -1,5 +1,5 @@
 import { api } from '../client';
-import type { CuisineCollection, CuisineInfo } from '../../../types/api.types';
+import type { CuisineCollection } from '../../../types/api.types';
 
 export const cuisineService = {
   async getAllCuisines(userOnly = false) {

@@ -138,7 +138,7 @@ export function useRecipeGeneration() {
       const history = await recipeService.getHistory(page, pageSize);
       
       console.log(`✅ Fetched ${history.recipes.length} recipes`);
-      console.log(`   Recipes with images: ${history.recipes.filter(r => r.image_urls).length}`);
+      console.log(`   Recipes with images: ${history.recipes.filter((r: GeneratedRecipeResponse) => r.image_urls).length}`);
       
       setRecipeHistory(history);
       return history;
@@ -198,17 +198,17 @@ export function useRecipeGeneration() {
       
       // Refresh history if loaded
       if (recipeHistory) {
-        const updatedRecipes = recipeHistory.recipes.map(recipe =>
+        const updatedRecipes = recipeHistory.recipes.map((recipe: GeneratedRecipeResponse) =>
           recipe.id === recipeId
             ? { ...recipe, is_favorite: !recipe.is_favorite }
             : recipe
         );
         setRecipeHistory({ ...recipeHistory, recipes: updatedRecipes });
       }
-      
+
       // Refresh favorites if loaded
       if (favorites) {
-        const updatedFavorites = favorites.recipes.map(recipe =>
+        const updatedFavorites = favorites.recipes.map((recipe: GeneratedRecipeResponse) =>
           recipe.id === recipeId
             ? { ...recipe, is_favorite: !recipe.is_favorite }
             : recipe
