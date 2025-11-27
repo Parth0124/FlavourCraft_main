@@ -149,8 +149,8 @@ const RecipeModal = ({ isOpen, onClose, recipe }: RecipeModalProps) => {
           </div>
 
           {/* Dietary Preferences Section */}
-          {(recipe.dietary_preferences || recipe.options?.dietary_preferences) && 
-           (recipe.dietary_preferences?.length > 0 || recipe.options?.dietary_preferences?.length > 0) && (
+          {(recipe.dietary_preferences || recipe.options?.dietary_preferences) &&
+           ((recipe.dietary_preferences?.length ?? 0) > 0 || (recipe.options?.dietary_preferences?.length ?? 0) > 0) && (
             <div className="bg-green-50 rounded-xl p-4 border border-green-100 mb-6">
               <div className="flex items-center gap-2 mb-3">
                 <Leaf className="w-5 h-5 text-green-600" />

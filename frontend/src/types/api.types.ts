@@ -70,7 +70,10 @@ export interface GeneratedRecipeResponse {
   cuisine_type?: string;  // ✅ FIXED: Added cuisine_type
   dietary_preferences?: string[];  // ✅ FIXED: Changed from string to string[]
   username?: string;  // Username of the creator
-  options?: string[];  // ✅ FIXED: Added for recipe options/variations
+  options?: {  // ✅ FIXED: Added for recipe options/variations
+    cuisine_type?: string;
+    dietary_preferences?: string[];
+  };
 }
 
 // Recipe History Response
