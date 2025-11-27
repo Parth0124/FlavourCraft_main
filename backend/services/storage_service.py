@@ -7,10 +7,8 @@ import os
 import aiofiles
 from datetime import datetime
 from pathlib import Path
-from config import get_settings
 from utils.logger import get_logger
 
-settings = get_settings()
 logger = get_logger(__name__)
 
 
@@ -23,12 +21,19 @@ class DatabaseManager:
     async def connect_to_database(self):
         """Connect to MongoDB"""
         try:
-            self.client = AsyncIOMotorClient(settings.MONGODB_URI)
-            self.db = self.client[settings.MONGODB_DB_NAME]
+            # Read credentials directly from environment variables
+            mongodb_uri = os.getenv('MONGODB_URI')
+            mongodb_db_name = os.getenv('MONGODB_DB_NAME', 'FlavourCraft')
+            
+            if not mongodb_uri:
+                raise ValueError("MONGODB_URI environment variable is not set")
+            
+            self.client = AsyncIOMotorClient(mongodb_uri)
+            self.db = self.client[mongodb_db_name]
             
             # Test connection
             await self.client.admin.command('ping')
-            logger.info(f"Connected to MongoDB: {settings.MONGODB_DB_NAME}")
+            logger.info(f"Connected to MongoDB: {mongodb_db_name}")
             
             # Create indexes
             await self.create_indexes()
@@ -95,8 +100,12 @@ class FileStorageManager:
     """File storage manager for uploads and temporary files"""
     
     def __init__(self):
-        self.upload_dir = Path(settings.UPLOAD_DIR)
-        self.temp_dir = Path(settings.TEMP_DIR)
+        # Read credentials directly from environment variables
+        upload_dir = os.getenv('UPLOAD_DIR', './uploads')
+        temp_dir = os.getenv('TEMP_DIR', './temp')
+        
+        self.upload_dir = Path(upload_dir)
+        self.temp_dir = Path(temp_dir)
         
         # Create directories if they don't exist
         self.upload_dir.mkdir(parents=True, exist_ok=True)

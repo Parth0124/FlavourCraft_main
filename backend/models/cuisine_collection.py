@@ -28,7 +28,7 @@ class CuisineCollectionResponse(BaseModel):
     """Response for cuisine collection page"""
     cuisine_type: str
     total_recipes: int
-    recipes: List[dict]  # List of recipe objects
+    recipes: List[dict]
     popular_ingredients: List[str]
     avg_cooking_time: Optional[float] = None
     difficulty_breakdown: Optional[dict] = None

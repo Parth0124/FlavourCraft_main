@@ -9,10 +9,10 @@ from bson import ObjectId
 
 class ImageUrls(BaseModel):
     """Image URLs from Cloudinary"""
-    url: str  # Full-size image URL
-    thumbnail_url: str  # 200x200 thumbnail
-    medium_url: str  # 600x600 medium size
-    public_id: str  # Cloudinary public ID for deletion
+    url: str 
+    thumbnail_url: str  
+    medium_url: str  
+    public_id: str  
     
     class Config:
         json_schema_extra = {
@@ -50,7 +50,7 @@ class GeneratedRecipe(BaseModel):
     """AI-generated recipe content"""
     title: str
     steps: List[str] = Field(..., min_items=3)
-    estimated_time: int  # minutes
+    estimated_time: int 
     difficulty: str
     tips: Optional[str] = None
     servings: int = Field(default=4)
@@ -82,13 +82,13 @@ class GeneratedRecipeDocument(BaseModel):
     user_id: str
     ingredients: List[str]
     generated_recipe: GeneratedRecipe
-    source: str = "ai"  # "openai" or "local_model"
+    source: str = "ai"
     confidence_score: float = Field(default=0.8, ge=0.0, le=1.0)
     is_favorite: bool = False
     timestamp: datetime = Field(default_factory=datetime.utcnow)
     dietary_preferences: List[str] = Field(default_factory=list)
     cuisine_type: Optional[str] = None
-    image_urls: Optional[ImageUrls] = None  # Ingredient image URLs from Cloudinary
+    image_urls: Optional[ImageUrls] = None
     
     class Config:
         populate_by_name = True
@@ -125,10 +125,10 @@ class GeneratedRecipeResponse(BaseModel):
     ingredients_used: List[str]
     created_at: datetime
     is_favorite: bool
-    image_urls: Optional[ImageUrls] = None  # Include the ingredient image URLs
-    username: Optional[str] = None  # Username of the user who created the recipe
-    cuisine_type: Optional[str] = None  # Cuisine type
-    dietary_preferences: List[str] = Field(default_factory=list)  # Dietary preferences as array
+    image_urls: Optional[ImageUrls] = None  
+    username: Optional[str] = None  
+    cuisine_type: Optional[str] = None 
+    dietary_preferences: List[str] = Field(default_factory=list)  
     
     class Config:
         json_schema_extra = {

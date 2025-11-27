@@ -29,7 +29,7 @@ class UserPreferences(BaseModel):
     """User dietary and cuisine preferences"""
     dietary_restrictions: List[str] = Field(default_factory=list)
     cuisine_preferences: List[str] = Field(default_factory=list)
-    cooking_skill: str = "beginner"  # beginner, intermediate, advanced
+    cooking_skill: str = "beginner"
 
 
 class UserCreate(BaseModel):

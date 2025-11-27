@@ -18,8 +18,8 @@ import asyncio
 import torch
 import numpy as np
 import time
+import os
 
-from config import get_settings
 from utils.logger import get_logger
 
 # MLOps imports - with lazy loading to avoid circular imports
@@ -52,7 +52,6 @@ def _get_monitor():
     return _model_monitor
 
 
-settings = get_settings()
 logger = get_logger(__name__)
 
 
@@ -60,7 +59,13 @@ class IngredientDetectionService:
     """Service for detecting ingredients from images"""
     
     def __init__(self):
-        self.use_local_models = settings.USE_LOCAL_MODELS
+        # Read credentials directly from environment variables
+        self.use_local_models = os.getenv('USE_LOCAL_MODELS', 'true').lower() == 'true'
+        self.openai_api_key = os.getenv('OPENAI_API_KEY')
+        self.openai_model = os.getenv('OPENAI_MODEL', 'gpt-4o-mini')
+        self.prometheus_enabled = os.getenv('PROMETHEUS_ENABLED', 'true').lower() == 'true'
+        self.enable_drift_detection = os.getenv('ENABLE_DRIFT_DETECTION', 'true').lower() == 'true'
+        
         self.local_model = None
         self.clip_processor = None
         self.openai_client = None
@@ -70,7 +75,7 @@ class IngredientDetectionService:
             self._initialize_local_model()
         
         # Initialize OpenAI as fallback
-        if settings.OPENAI_API_KEY:
+        if self.openai_api_key:
             self._initialize_openai_client()
     
     def _initialize_local_model(self):
@@ -141,7 +146,7 @@ class IngredientDetectionService:
         """Initialize OpenAI client"""
         try:
             from openai import AsyncOpenAI
-            self.openai_client = AsyncOpenAI(api_key=settings.OPENAI_API_KEY)
+            self.openai_client = AsyncOpenAI(api_key=self.openai_api_key)
             logger.info("OpenAI client initialized successfully")
         except Exception as e:
             logger.error(f"Failed to initialize OpenAI client: {str(e)}")
@@ -218,7 +223,7 @@ class IngredientDetectionService:
             return [], 0.0
         
         # STEP 2: MLOPS TRACKING (Non-critical - can fail safely)
-        if settings.PROMETHEUS_ENABLED:
+        if self.prometheus_enabled:
             try:
                 prometheus = _get_prometheus()
                 prometheus.track_ingredient_detection(
@@ -280,7 +285,7 @@ class IngredientDetectionService:
             
             # Call OpenAI Vision API
             response = await self.openai_client.chat.completions.create(
-                model=settings.OPENAI_MODEL,
+                model=self.openai_model,
                 messages=[
                     {
                         "role": "user",
@@ -301,7 +306,7 @@ class IngredientDetectionService:
                         ]
                     }
                 ],
-                max_tokens=settings.OPENAI_MAX_TOKENS
+                max_tokens=int(os.getenv('OPENAI_MAX_TOKENS', '2000'))
             )
             
             # Parse response
@@ -327,7 +332,7 @@ class IngredientDetectionService:
             return [], 0.0
         
         # STEP 2: MLOPS TRACKING (Non-critical - can fail safely)
-        if settings.PROMETHEUS_ENABLED:
+        if self.prometheus_enabled:
             try:
                 prometheus = _get_prometheus()
                 prometheus.track_ingredient_detection(
@@ -361,7 +366,7 @@ class IngredientDetectionService:
                     confidence_scores={ing: confidence for ing in ingredients},
                     detection_method="openai_vision",
                     processing_time=processing_time,
-                    image_metadata={"model": settings.OPENAI_MODEL}
+                    image_metadata={"model": self.openai_model}
                 )
                 
                 logger.debug(f"[MLOps] OpenAI detection tracked: {len(ingredients)} ingredients")
@@ -482,7 +487,7 @@ class IngredientDetectionService:
         pipeline_time = time.time() - pipeline_start
         
         # Track full pipeline (non-critical)
-        if settings.PROMETHEUS_ENABLED:
+        if self.prometheus_enabled:
             try:
                 prometheus = _get_prometheus()
                 prometheus.track_ingredient_detection(
@@ -494,7 +499,7 @@ class IngredientDetectionService:
                 )
                 
                 # Check for drift
-                if settings.ENABLE_DRIFT_DETECTION:
+                if self.enable_drift_detection:
                     monitor = _get_monitor()
                     drift_result = monitor.check_drift(
                         model_name="ingredient_detection_pipeline",

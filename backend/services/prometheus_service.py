@@ -9,7 +9,6 @@ from functools import wraps
 
 # Lazy import to avoid circular dependencies
 _logger = None
-_settings = None
 
 
 def _get_logger():
@@ -18,14 +17,6 @@ def _get_logger():
         from utils.logger import get_logger
         _logger = get_logger(__name__)
     return _logger
-
-
-def _get_settings():
-    global _settings
-    if _settings is None:
-        from mlops_config import get_mlops_settings
-        _settings = get_mlops_settings()
-    return _settings
 
 
 class PrometheusMetrics:

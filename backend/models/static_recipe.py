@@ -9,9 +9,9 @@ from bson import ObjectId
 class NutritionInfo(BaseModel):
     """Nutritional information for a recipe"""
     calories: int
-    protein: int  # grams
-    carbs: int  # grams
-    fat: int  # grams
+    protein: int
+    carbs: int
+    fat: int
 
 
 class StaticRecipe(BaseModel):
@@ -22,8 +22,8 @@ class StaticRecipe(BaseModel):
     instructions: str = Field(..., min_length=20)
     tags: List[str] = Field(default_factory=list)
     difficulty: str = Field(..., pattern="^(easy|medium|hard)$")
-    prep_time: int = Field(..., gt=0)  # minutes
-    cook_time: int = Field(..., gt=0)  # minutes
+    prep_time: int = Field(..., gt=0)  
+    cook_time: int = Field(..., gt=0)  
     servings: int = Field(default=4, gt=0)
     nutrition: Optional[NutritionInfo] = None
     image_url: Optional[str] = None

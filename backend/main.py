@@ -5,13 +5,19 @@ Main FastAPI application entry point
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
-
-from config import get_settings
+import os
 import importlib
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
+
 from services.storage_service import db_manager, file_storage
 from utils.logger import get_logger
 
-settings = get_settings()
+from fastapi.responses import Response
+from services.prometheus_service import prometheus_metrics
+
 logger = get_logger(__name__)
 
 '''
@@ -97,13 +103,22 @@ app = FastAPI(
     lifespan=lifespan
 )
 
+# Read CORS configuration directly from environment variables
+cors_origins = os.getenv('CORS_ORIGINS', '*')
+cors_credentials = os.getenv('CORS_CREDENTIALS', 'true').lower() == 'true'
+cors_methods = os.getenv('CORS_METHODS', '*')
+cors_headers = os.getenv('CORS_HEADERS', '*')
+
+# Parse CORS origins list
+cors_origins_list = [origin.strip() for origin in cors_origins.split(',')] if cors_origins != '*' else ['*']
+
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.cors_origins_list,
-    allow_credentials=settings.CORS_CREDENTIALS,
-    allow_methods=["*"] if settings.CORS_METHODS == "*" else settings.CORS_METHODS.split(","),
-    allow_headers=["*"] if settings.CORS_HEADERS == "*" else settings.CORS_HEADERS.split(","),
+    allow_origins=cors_origins_list,
+    allow_credentials=cors_credentials,
+    allow_methods=["*"] if cors_methods == "*" else [method.strip() for method in cors_methods.split(",")],
+    allow_headers=["*"] if cors_headers == "*" else [header.strip() for header in cors_headers.split(",")],
 )
 
 # Include routers
@@ -113,6 +128,15 @@ app.include_router(recipes.router)
 app.include_router(users.router)
 app.include_router(cuisine.router)
 app.include_router(mlops_monitoring.router)
+
+@app.get("/metrics", tags=["Monitoring"])
+async def metrics():
+    """Prometheus metrics endpoint"""
+    metrics_data = prometheus_metrics.get_metrics()
+    return Response(
+        content=metrics_data,
+        media_type="text/plain; version=0.0.4; charset=utf-8"
+    )
 
 @app.get("/", tags=["Root"])
 async def root():
@@ -134,9 +158,12 @@ async def health_check():
     """
     Health check endpoint
     """
+    # Read environment directly from environment variable
+    environment = os.getenv('ENVIRONMENT', 'development')
+    
     return {
         "status": "healthy",
-        "environment": settings.ENVIRONMENT,
+        "environment": environment,
         "database": "connected" if db_manager.db else "disconnected"
     }
 
@@ -144,9 +171,14 @@ async def health_check():
 if __name__ == "__main__":
     import uvicorn
     
+    # Read credentials directly from environment variables
+    api_host = os.getenv('API_HOST', '0.0.0.0')
+    api_port = int(os.getenv('API_PORT', '8000'))
+    environment = os.getenv('ENVIRONMENT', 'development')
+    
     uvicorn.run(
         "main:app",
-        host=settings.API_HOST,
-        port=settings.API_PORT,
-        reload=settings.ENVIRONMENT == "development"
+        host=api_host,
+        port=api_port,
+        reload=environment == "development"
     )

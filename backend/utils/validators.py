@@ -2,12 +2,10 @@
 Input validation utilities
 """
 import re
+import os
 from typing import List
 from fastapi import UploadFile
 import magic
-from config import get_settings
-
-settings = get_settings()
 
 
 def validate_email(email: str) -> bool:
@@ -89,13 +87,18 @@ async def validate_image_file(file: UploadFile) -> tuple[bool, str]:
     Returns:
         Tuple of (is_valid, error_message)
     """
+    # Read credentials directly from environment variables
+    max_upload_size = int(os.getenv('MAX_UPLOAD_SIZE', '10485760'))  # 10MB default
+    allowed_extensions = os.getenv('ALLOWED_EXTENSIONS', 'jpg,jpeg,png,webp')
+    allowed_extensions_list = [ext.strip() for ext in allowed_extensions.split(',')]
+    
     # Check file size
     content = await file.read()
     file_size = len(content)
     await file.seek(0)  # Reset file pointer
     
-    if file_size > settings.MAX_UPLOAD_SIZE:
-        max_mb = settings.MAX_UPLOAD_SIZE / (1024 * 1024)
+    if file_size > max_upload_size:
+        max_mb = max_upload_size / (1024 * 1024)
         return False, f"File size exceeds maximum allowed size of {max_mb}MB"
     
     # Check file extension
@@ -103,8 +106,8 @@ async def validate_image_file(file: UploadFile) -> tuple[bool, str]:
         return False, "No filename provided"
     
     file_ext = file.filename.split('.')[-1].lower()
-    if file_ext not in settings.allowed_extensions_list:
-        return False, f"File type .{file_ext} not allowed. Allowed types: {settings.ALLOWED_EXTENSIONS}"
+    if file_ext not in allowed_extensions_list:
+        return False, f"File type .{file_ext} not allowed. Allowed types: {allowed_extensions}"
     
     # Check actual file type using magic
     try:

@@ -6,6 +6,7 @@ from datetime import datetime
 from motor.motor_asyncio import AsyncIOMotorDatabase
 from bson import ObjectId
 import time
+import os
 
 from models.generated_recipe import (
     GeneratedRecipeRequest,
@@ -14,7 +15,6 @@ from models.generated_recipe import (
     GeneratedRecipeResponse
 )
 from models.static_recipe import StaticRecipe, RecipeFilter
-from config import get_settings
 from utils.logger import get_logger
 
 # MLOps imports
@@ -22,7 +22,6 @@ from services.mlflow_service import mlflow_manager
 from services.prometheus_service import prometheus_metrics
 from services.model_monitoring_service import model_monitor
 
-settings = get_settings()
 logger = get_logger(__name__)
 
 
@@ -34,7 +33,12 @@ class RecipeGenerationService:
         self.generated_recipes_collection = db.generated_recipes
         self.openai_client = None
         
-        if settings.OPENAI_API_KEY:
+        # Read credentials directly from environment variables
+        self.openai_api_key = os.getenv('OPENAI_API_KEY')
+        self.openai_model = os.getenv('OPENAI_MODEL', 'gpt-4o-mini')
+        self.openai_max_tokens = int(os.getenv('OPENAI_MAX_TOKENS', '2000'))
+        
+        if self.openai_api_key:
             self._initialize_openai()
         
         # MLOps: Set baseline for monitoring
@@ -49,7 +53,7 @@ class RecipeGenerationService:
         """Initialize OpenAI client"""
         try:
             from openai import AsyncOpenAI
-            self.openai_client = AsyncOpenAI(api_key=settings.OPENAI_API_KEY)
+            self.openai_client = AsyncOpenAI(api_key=self.openai_api_key)
             logger.info("OpenAI client initialized for recipe generation")
         except Exception as e:
             logger.error(f"Failed to initialize OpenAI: {str(e)}")
@@ -80,7 +84,7 @@ class RecipeGenerationService:
             
             # Call OpenAI API
             response = await self.openai_client.chat.completions.create(
-                model=settings.OPENAI_MODEL,
+                model=self.openai_model,
                 messages=[
                     {
                         "role": "system",
@@ -91,7 +95,7 @@ class RecipeGenerationService:
                         "content": prompt
                     }
                 ],
-                max_tokens=settings.OPENAI_MAX_TOKENS,
+                max_tokens=self.openai_max_tokens,
                 temperature=0.7
             )
             

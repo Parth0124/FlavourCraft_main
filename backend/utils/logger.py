@@ -3,10 +3,8 @@ Logging configuration for FlavourCraft
 """
 import logging
 import sys
+import os
 from pythonjsonlogger import jsonlogger
-from config import get_settings
-
-settings = get_settings()
 
 
 class CustomJsonFormatter(jsonlogger.JsonFormatter):
@@ -32,8 +30,11 @@ def setup_logger(name: str, level: str = None) -> logging.Logger:
     """
     logger = logging.getLogger(name)
     
+    # Read credentials directly from environment variables
+    environment = os.getenv('ENVIRONMENT', 'development')
+    log_level = level or os.getenv('LOG_LEVEL', 'INFO')
+    
     # Set level
-    log_level = level or settings.LOG_LEVEL
     logger.setLevel(getattr(logging, log_level.upper()))
     
     # Remove existing handlers
@@ -43,7 +44,7 @@ def setup_logger(name: str, level: str = None) -> logging.Logger:
     handler = logging.StreamHandler(sys.stdout)
     
     # Use JSON formatter for production, simple formatter for development
-    if settings.ENVIRONMENT == "production":
+    if environment == "production":
         formatter = CustomJsonFormatter(
             '%(timestamp)s %(level)s %(name)s %(message)s'
         )

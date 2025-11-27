@@ -5,9 +5,7 @@ from passlib.context import CryptContext
 from jose import JWTError, jwt
 from datetime import datetime, timedelta
 from typing import Optional
-from config import get_settings
-
-settings = get_settings()
+import os
 
 # Password hashing context
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -51,20 +49,26 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -
     Returns:
         Encoded JWT token string
     """
+    # Read credentials directly from environment variables
+    jwt_secret_key = os.getenv('JWT_SECRET_KEY')
+    jwt_algorithm = os.getenv('JWT_ALGORITHM', 'HS256')
+    access_token_expire_minutes = int(os.getenv('ACCESS_TOKEN_EXPIRE_MINUTES', '720'))
+    
+    if not jwt_secret_key:
+        raise ValueError("JWT_SECRET_KEY environment variable is not set")
+    
     to_encode = data.copy()
     
     if expires_delta:
         expire = datetime.utcnow() + expires_delta
     else:
-        expire = datetime.utcnow() + timedelta(
-            minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES
-        )
+        expire = datetime.utcnow() + timedelta(minutes=access_token_expire_minutes)
     
     to_encode.update({"exp": expire, "type": "access"})
     encoded_jwt = jwt.encode(
         to_encode, 
-        settings.JWT_SECRET_KEY, 
-        algorithm=settings.JWT_ALGORITHM
+        jwt_secret_key, 
+        algorithm=jwt_algorithm
     )
     return encoded_jwt
 
@@ -79,14 +83,22 @@ def create_refresh_token(data: dict) -> str:
     Returns:
         Encoded JWT refresh token string
     """
+    # Read credentials directly from environment variables
+    jwt_secret_key = os.getenv('JWT_SECRET_KEY')
+    jwt_algorithm = os.getenv('JWT_ALGORITHM', 'HS256')
+    refresh_token_expire_days = int(os.getenv('REFRESH_TOKEN_EXPIRE_DAYS', '7'))
+    
+    if not jwt_secret_key:
+        raise ValueError("JWT_SECRET_KEY environment variable is not set")
+    
     to_encode = data.copy()
-    expire = datetime.utcnow() + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
+    expire = datetime.utcnow() + timedelta(days=refresh_token_expire_days)
     
     to_encode.update({"exp": expire, "type": "refresh"})
     encoded_jwt = jwt.encode(
         to_encode, 
-        settings.JWT_SECRET_KEY, 
-        algorithm=settings.JWT_ALGORITHM
+        jwt_secret_key, 
+        algorithm=jwt_algorithm
     )
     return encoded_jwt
 
@@ -101,11 +113,18 @@ def decode_token(token: str) -> Optional[dict]:
     Returns:
         Decoded token payload or None if invalid
     """
+    # Read credentials directly from environment variables
+    jwt_secret_key = os.getenv('JWT_SECRET_KEY')
+    jwt_algorithm = os.getenv('JWT_ALGORITHM', 'HS256')
+    
+    if not jwt_secret_key:
+        return None
+    
     try:
         payload = jwt.decode(
             token, 
-            settings.JWT_SECRET_KEY, 
-            algorithms=[settings.JWT_ALGORITHM]
+            jwt_secret_key, 
+            algorithms=[jwt_algorithm]
         )
         return payload
     except JWTError:

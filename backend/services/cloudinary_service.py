@@ -7,11 +7,10 @@ import cloudinary.uploader
 import cloudinary.api
 from typing import Optional, Dict
 from io import BytesIO
+import os
 
-from config import get_settings
 from utils.logger import get_logger
 
-settings = get_settings()
 logger = get_logger(__name__)
 
 
@@ -22,21 +21,27 @@ class CloudinaryService:
         """Initialize Cloudinary configuration"""
         self.is_configured = False
         
-        if settings.CLOUDINARY_CLOUD_NAME and settings.CLOUDINARY_API_KEY and settings.CLOUDINARY_API_SECRET:
+        # Read credentials directly from environment variables
+        cloud_name = os.getenv('CLOUDINARY_CLOUD_NAME')
+        api_key = os.getenv('CLOUDINARY_API_KEY')
+        api_secret = os.getenv('CLOUDINARY_API_SECRET')
+        
+        if cloud_name and api_key and api_secret:
             try:
                 cloudinary.config(
-                    cloud_name=settings.CLOUDINARY_CLOUD_NAME,
-                    api_key=settings.CLOUDINARY_API_KEY,
-                    api_secret=settings.CLOUDINARY_API_SECRET,
+                    cloud_name=cloud_name,
+                    api_key=api_key,
+                    api_secret=api_secret,
                     secure=True
                 )
                 self.is_configured = True
+                self.cloud_name = cloud_name
                 logger.info("✅ Cloudinary configured successfully")
             except Exception as e:
                 logger.error(f"Failed to configure Cloudinary: {str(e)}")
                 self.is_configured = False
         else:
-            logger.warning("⚠️  Cloudinary not configured - image URLs will not be stored")
+            logger.warning("⚠️ Cloudinary not configured - image URLs will not be stored")
             logger.info("Add CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, and CLOUDINARY_API_SECRET to .env")
     
     async def upload_image(
@@ -123,7 +128,7 @@ class CloudinaryService:
             
             # ✅ FIX: Build transformation URLs manually for consistency
             # This ensures they match the eager transformations
-            base_url = f"https://res.cloudinary.com/{settings.CLOUDINARY_CLOUD_NAME}/image/upload"
+            base_url = f"https://res.cloudinary.com/{self.cloud_name}/image/upload"
             
             # Thumbnail URL with fill crop (better than thumb for grid display)
             thumbnail_url = f"{base_url}/c_fill,g_auto,h_200,w_200,q_auto:good,f_auto/{public_id_full}"
@@ -174,7 +179,7 @@ class CloudinaryService:
                 logger.info(f"✅ Image deleted from Cloudinary: {public_id}")
                 return True
             else:
-                logger.warning(f"⚠️  Failed to delete image: {result}")
+                logger.warning(f"⚠️ Failed to delete image: {result}")
                 return False
                 
         except Exception as e:

@@ -12,7 +12,6 @@ import os
 
 # Lazy imports to avoid circular dependencies
 _logger = None
-_settings = None
 
 
 def _get_logger():
@@ -21,14 +20,6 @@ def _get_logger():
         from utils.logger import get_logger
         _logger = get_logger(__name__)
     return _logger
-
-
-def _get_settings():
-    global _settings
-    if _settings is None:
-        from mlops_config import get_mlops_settings
-        _settings = get_mlops_settings()
-    return _settings
 
 
 class MLflowManager:
@@ -50,29 +41,33 @@ class MLflowManager:
             return self.initialized
         
         self._connection_attempted = True
-        settings = _get_settings()
+        
+        # Read credentials directly from environment variables
+        mlflow_tracking_uri = os.getenv('MLFLOW_TRACKING_URI', 'http://localhost:5001')
+        mlflow_experiment_name = os.getenv('MLFLOW_EXPERIMENT_NAME', 'flavourcraft-recipe-generation')
+        mlflow_artifact_location = os.getenv('MLFLOW_ARTIFACT_LOCATION', './mlruns')
         
         try:
             # Set tracking URI
-            tracking_uri = settings.MLFLOW_TRACKING_URI
-            mlflow.set_tracking_uri(tracking_uri)
-            print(f"[MLflow] Tracking URI set to: {tracking_uri}")
+            mlflow.set_tracking_uri(mlflow_tracking_uri)
+            print(f"[MLflow] Tracking URI set to: {mlflow_tracking_uri}")
             
             # Try to create/get experiment
             try:
-                experiment = mlflow.get_experiment_by_name(settings.MLFLOW_EXPERIMENT_NAME)
+                experiment = mlflow.get_experiment_by_name(mlflow_experiment_name)
                 if experiment is None:
                     self.experiment_id = mlflow.create_experiment(
-                        settings.MLFLOW_EXPERIMENT_NAME,
-                        artifact_location=settings.MLFLOW_ARTIFACT_LOCATION
+                        mlflow_experiment_name,
+                        artifact_location=mlflow_artifact_location
                     )
-                    print(f"[MLflow] Created new experiment: {settings.MLFLOW_EXPERIMENT_NAME}")
+                    print(f"[MLflow] Created new experiment: {mlflow_experiment_name}")
                 else:
                     self.experiment_id = experiment.experiment_id
-                    print(f"[MLflow] Using existing experiment: {settings.MLFLOW_EXPERIMENT_NAME}")
+                    print(f"[MLflow] Using existing experiment: {mlflow_experiment_name}")
                 
-                mlflow.set_experiment(settings.MLFLOW_EXPERIMENT_NAME)
+                mlflow.set_experiment(mlflow_experiment_name)
                 self.initialized = True
+                self.mlflow_experiment_name = mlflow_experiment_name
                 print(f"[MLflow] Initialized successfully with experiment ID: {self.experiment_id}")
                 
             except Exception as e:
@@ -336,8 +331,7 @@ class MLflowManager:
             return None
         
         try:
-            settings = _get_settings()
-            experiment = mlflow.get_experiment_by_name(settings.MLFLOW_EXPERIMENT_NAME)
+            experiment = mlflow.get_experiment_by_name(self.mlflow_experiment_name)
             if not experiment:
                 return None
             
@@ -367,8 +361,7 @@ class MLflowManager:
             return {}
         
         try:
-            settings = _get_settings()
-            experiment = mlflow.get_experiment_by_name(settings.MLFLOW_EXPERIMENT_NAME)
+            experiment = mlflow.get_experiment_by_name(self.mlflow_experiment_name)
             if not experiment:
                 return {}
             
@@ -400,8 +393,7 @@ class MLflowManager:
             return {"error": "MLflow not initialized"}
         
         try:
-            settings = _get_settings()
-            experiment = mlflow.get_experiment_by_name(settings.MLFLOW_EXPERIMENT_NAME)
+            experiment = mlflow.get_experiment_by_name(self.mlflow_experiment_name)
             if not experiment:
                 return {"error": "Experiment not found"}
             
@@ -411,7 +403,7 @@ class MLflowManager:
             )
             
             return {
-                "experiment_name": settings.MLFLOW_EXPERIMENT_NAME,
+                "experiment_name": self.mlflow_experiment_name,
                 "experiment_id": experiment.experiment_id,
                 "total_runs": len(runs),
                 "artifact_location": experiment.artifact_location,
