@@ -2,3 +2,5 @@
 flavourcraftenv/
 backend/config.pybackend/config.py
 *.pyc
+DEPLOYMENT.md
+QUICK_DEPLOY.md

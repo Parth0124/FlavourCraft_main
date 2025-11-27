@@ -156,16 +156,79 @@ async def root():
 @app.get("/health", tags=["Health"])
 async def health_check():
     """
-    Health check endpoint
+    Comprehensive health check endpoint for production monitoring
     """
+    import psutil
+    from datetime import datetime, timezone
+
+
     # Read environment directly from environment variable
     environment = os.getenv('ENVIRONMENT', 'development')
-    
-    return {
-        "status": "healthy",
+
+    # Check database connectivity
+    db_status = "connected" if db_manager.db is not None else "disconnected"
+    db_healthy = db_manager.db is not None
+
+    # Check disk space (uploads directory)
+    try:
+        disk_usage = psutil.disk_usage('/')
+        disk_healthy = disk_usage.percent < 90  # Alert if disk > 90%
+        disk_info = {
+            "total_gb": round(disk_usage.total / (1024**3), 2),
+            "used_gb": round(disk_usage.used / (1024**3), 2),
+            "free_gb": round(disk_usage.free / (1024**3), 2),
+            "percent_used": disk_usage.percent
+        }
+    except Exception as e:
+        disk_healthy = False
+        disk_info = {"error": str(e)}
+
+    # Check memory usage
+    try:
+        memory = psutil.virtual_memory()
+        memory_healthy = memory.percent < 90  # Alert if memory > 90%
+        memory_info = {
+            "total_gb": round(memory.total / (1024**3), 2),
+            "available_gb": round(memory.available / (1024**3), 2),
+            "percent_used": memory.percent
+        }
+    except Exception as e:
+        memory_healthy = False
+        memory_info = {"error": str(e)}
+
+    # Overall health status
+    overall_healthy = db_healthy and disk_healthy and memory_healthy
+
+    response = {
+        "status": "healthy" if overall_healthy else "degraded",
+        "timestamp": datetime.now(timezone.utc).isoformat(),
         "environment": environment,
-        "database": "connected" if db_manager.db else "disconnected"
+        "checks": {
+            "database": {
+                "status": db_status,
+                "healthy": db_healthy
+            },
+            "disk": {
+                "healthy": disk_healthy,
+                **disk_info
+            },
+            "memory": {
+                "healthy": memory_healthy,
+                **memory_info
+            }
+        }
     }
+
+    # Return 503 if unhealthy (useful for load balancers)
+    if not overall_healthy:
+        from fastapi import status
+        from fastapi.responses import JSONResponse
+        return JSONResponse(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            content=response
+        )
+
+    return response
 
 
 if __name__ == "__main__":

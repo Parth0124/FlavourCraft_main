@@ -1,0 +1,126 @@
+# Render.com deployment configuration
+# Documentation: https://render.com/docs/yaml-spec
+
+services:
+  # FastAPI Backend Service
+  - type: web
+    name: flavourcraft-backend
+    env: docker
+    region: oregon  # Choose: oregon, frankfurt, ohio, singapore
+    plan: free  # Free tier
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+
+    # Auto-deploy on push to main branch
+    branch: main
+
+    # Health check configuration
+    healthCheckPath: /health
+
+    # Environment variables
+    # Note: Set sensitive values in Render Dashboard under "Environment"
+    envVars:
+      - key: ENVIRONMENT
+        value: production
+
+      - key: API_HOST
+        value: 0.0.0.0
+
+      - key: API_PORT
+        value: 8000
+
+      - key: LOG_LEVEL
+        value: INFO
+
+      - key: JWT_ALGORITHM
+        value: HS256
+
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: 720
+
+      - key: REFRESH_TOKEN_EXPIRE_DAYS
+        value: 7
+
+      - key: OPENAI_MODEL
+        value: gpt-4o-mini
+
+      - key: OPENAI_MAX_TOKENS
+        value: 1000
+
+      - key: USE_LOCAL_MODELS
+        value: true
+
+      - key: INGREDIENT_DETECTION_MODEL
+        value: openai/clip-vit-base-patch32
+
+      - key: MAX_UPLOAD_SIZE
+        value: 10485760
+
+      - key: ALLOWED_EXTENSIONS
+        value: jpg,jpeg,png,webp
+
+      - key: UPLOAD_DIR
+        value: /app/uploads
+
+      - key: TEMP_DIR
+        value: /app/temp
+
+      - key: CORS_CREDENTIALS
+        value: true
+
+      - key: CORS_METHODS
+        value: "*"
+
+      - key: CORS_HEADERS
+        value: "*"
+
+      - key: MLFLOW_EXPERIMENT_NAME
+        value: flavourcraft-recipe-generation
+
+      - key: PROMETHEUS_PORT
+        value: 8001
+
+      - key: PROMETHEUS_ENABLED
+        value: false  # Disable for free tier
+
+      - key: ENABLE_DRIFT_DETECTION
+        value: false  # Disable for free tier
+
+      - key: RATE_LIMIT_PER_MINUTE
+        value: 60
+
+      # SECRETS - Set these in Render Dashboard
+      # DO NOT commit actual values to Git
+      - key: MONGODB_URI
+        sync: false  # Must be set in Render Dashboard
+
+      - key: JWT_SECRET_KEY
+        sync: false
+
+      - key: OPENAI_API_KEY
+        sync: false
+
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+
+      - key: CLOUDINARY_API_KEY
+        sync: false
+
+      - key: CLOUDINARY_API_SECRET
+        sync: false
+
+      - key: CORS_ORIGINS
+        sync: false  # Set to your frontend URL
+
+# Notes for Render Free Tier:
+# - Services spin down after 15 minutes of inactivity
+# - First request after spin-down takes 30-60 seconds to restart
+# - 750 hours/month free usage
+# - No credit card required
+#
+# To deploy:
+# 1. Push this file to your repository
+# 2. Connect your GitHub repo to Render
+# 3. Render will auto-detect this file
+# 4. Set secret environment variables in Render Dashboard
+# 5. Deploy!
