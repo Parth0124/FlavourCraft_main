@@ -233,15 +233,16 @@ async def health_check():
 
 if __name__ == "__main__":
     import uvicorn
-    
-    # Read credentials directly from environment variables
-    api_host = os.getenv('API_HOST', '0.0.0.0')
-    api_port = int(os.getenv('API_PORT', '8000'))
-    environment = os.getenv('ENVIRONMENT', 'development')
-    
+
+    # Prefer platform PORT (e.g. Render/Railway). Fall back to API_PORT (local .env) then 8000.
+    api_host = os.getenv("API_HOST", "0.0.0.0")
+    # Use PORT if set by the platform; otherwise fall back to API_PORT (your .env) or 8000.
+    api_port = int(os.getenv("PORT", os.getenv("API_PORT", "8000")))
+    environment = os.getenv("ENVIRONMENT", "development")
+
     uvicorn.run(
         "main:app",
         host=api_host,
         port=api_port,
-        reload=environment == "development"
+        reload=(environment == "development")
     )

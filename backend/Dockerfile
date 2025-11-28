@@ -40,22 +40,22 @@ ENV PATH="/opt/venv/bin:${PATH}"
 # Copy application code
 COPY . .
 
-# Create necessary directories
-RUN mkdir -p uploads temp logs mlruns
-
-# Create non-root user and own application files and the venv
-RUN useradd -m -u 1000 appuser \
- && chown -R appuser:appuser /app /opt/venv /uploads /temp /logs /mlruns || true
+# Create necessary directories (absolute paths) and set ownership
+RUN mkdir -p /app/uploads /app/temp /app/logs /app/mlruns \
+ && useradd -m -u 1000 appuser \
+ && chown -R appuser:appuser /app /opt/venv /app/uploads /app/temp /app/logs /app/mlruns || true
 
 # Switch to non-root user
 USER appuser
 
-# Expose port
-EXPOSE 8000
+# Default port for local testing; platforms will override PORT env var at runtime
+ENV PORT=8000
+EXPOSE ${PORT}
 
-# Health check (runs as container user)
+# Health check uses the same PORT env var
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
-  CMD curl -f http://localhost:8000/health || exit 1
+  CMD sh -c "curl -f http://localhost:${PORT}/health || exit 1"
 
-# Run the application via the venv-installed uvicorn (PATH already set)
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "1"]
+# Run the application via the venv-installed uvicorn and use the PORT env var
+# Use sh -c so ${PORT} expands inside the container
+CMD ["sh", "-c", "uvicorn main:app --host 0.0.0.0 --port ${PORT} --workers 1"]
