@@ -131,10 +131,13 @@ jobs:
 
       # Optional: Manual trigger if you set up deploy hook
       - name: 🔔 Trigger Vercel deployment (optional)
-        if: ${{ secrets.VERCEL_DEPLOY_HOOK_URL != '' }}
         run: |
-          response=$(curl -s -o /dev/null -w "%{http_code}" -X POST "${{ secrets.VERCEL_DEPLOY_HOOK_URL }}")
-          echo "📡 Vercel deploy hook triggered (HTTP $response)"
+          if [ -n "${{ secrets.VERCEL_DEPLOY_HOOK_URL }}" ]; then
+            response=$(curl -s -o /dev/null -w "%{http_code}" -X POST "${{ secrets.VERCEL_DEPLOY_HOOK_URL }}")
+            echo "📡 Vercel deploy hook triggered (HTTP $response)"
+          else
+            echo "ℹ️ Vercel deploy hook not configured (optional)"
+          fi
         continue-on-error: true
 
   # ====================================

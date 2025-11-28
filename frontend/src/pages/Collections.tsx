@@ -61,6 +61,7 @@ const CollectionsPage = () => {
     try {
       const generatedData = await recipeService.getAllGeneratedRecipes(1, 100);
       console.log("📥 Raw API Response:", generatedData);
+      console.log("📊 Number of recipes received:", generatedData.recipes?.length || 0);
       
       if (generatedData.recipes && generatedData.recipes.length > 0) {
         console.log("🔍 First RAW recipe from API:", generatedData.recipes[0]);
